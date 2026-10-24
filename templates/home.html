@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Home | Intelligent Grievance Portal{% endblock %}
+
+{% block content %}
+<!-- Institutional Hero Section -->
+<section class="py-5 bg-white border-bottom">
+    <div class="container px-lg-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-light border text-primary small fw-semibold">
+                    <i class="bi bi-cpu-fill text-warning"></i> NLP & Machine Learning Driven Redressal System
+                </div>
+                <h1 class="display-5 fw-bold text-dark lh-sm mb-3">
+                    Intelligent Student Grievance Resolution System
+                </h1>
+                <p class="lead text-secondary mb-4 fs-6">
+                    A centralized institutional platform for submitting, analyzing, and resolving student grievances efficiently. Built with natural language processing for automated category classification, urgency prioritization, duplicate detection, and intelligent department routing.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('login') }}" class="btn btn-institutional px-4 py-2 shadow-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Login to Portal
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-institutional px-4 py-2">
+                        <i class="bi bi-person-plus me-1"></i> Student Registration
+                    </a>
+                    <a href="#workflow" class="btn btn-light border px-3 py-2 text-secondary">
+                        <i class="bi bi-arrow-down-circle me-1"></i> Explore Workflow
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <!-- Portal Quick Institutional Overview Card -->
+                <div class="card card-institutional shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <span class="small text-uppercase fw-bold text-muted">Institutional Live Status</span>
+                        <span class="badge bg-success small"><i class="bi bi-circle-fill me-1" style="font-size: 6px;"></i> Active Portal</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3 text-center">
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <div class="fs-4 fw-bold text-primary">{{ total_count }}</div>
+                                    <div class="small text-muted" style="font-size: 0.72rem;">Grievances Logged</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <div class="fs-4 fw-bold text-success">{{ resolved_count }}</div>
+                                    <div class="small text-muted" style="font-size: 0.72rem;">Cases Resolved</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 border rounded bg-light">
+                                    <div class="fs-4 fw-bold text-dark">{{ dept_count }}</div>
+                                    <div class="small text-muted" style="font-size: 0.72rem;">Departments Active</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <h6 class="small fw-bold text-dark mb-2">Role Access Protocol:</h6>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <li class="mb-1"><i class="bi bi-check2 text-primary me-2"></i><strong>Students:</strong> Submit grievances, live progress timeline, resolution feedback.</li>
+                            <li class="mb-1"><i class="bi bi-check2 text-primary me-2"></i><strong>Staff:</strong> Department workload queue, status updates with remarks.</li>
+                            <li><i class="bi bi-check2 text-primary me-2"></i><strong>Admin:</strong> Campus-wide ML analytics, reassignment, duplicate mitigation.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="workflow" class="py-5 bg-light border-bottom">
+    <div class="container px-lg-4">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-uppercase fw-bold text-primary small">Resolution Lifecycle</span>
+            <h2 class="fw-bold text-dark mt-1">How The Intelligent Agent Works</h2>
+            <p class="text-muted small">From plain-text complaint submission to verified resolution, powered by scikit-learn models and rule-governed workflows.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md">
+                <div class="card card-institutional h-100 p-3 text-center">
+                    <div class="stat-icon total mx-auto mb-3">1</div>
+                    <h6 class="fw-bold text-dark">Student Submits Grievance</h6>
+                    <p class="small text-muted mb-0">Student enters title, detailed description, and optional photographic proof without requiring manual category or priority guessing.</p>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card card-institutional h-100 p-3 text-center">
+                    <div class="stat-icon progress mx-auto mb-3">2</div>
+                    <h6 class="fw-bold text-dark">AI Analyzes Content</h6>
+                    <p class="small text-muted mb-0">TF-IDF vectorizer extracts linguistic n-grams; Logistic Regression & Linear SVM predict Category, Urgency, and Sentiment.</p>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card card-institutional h-100 p-3 text-center">
+                    <div class="stat-icon pending mx-auto mb-3">3</div>
+                    <h6 class="fw-bold text-dark">Intelligent Routing & Duplication</h6>
+                    <p class="small text-muted mb-0">System scans for semantic duplicate complaints and automatically balances workload to assign an authorized staff member.</p>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card card-institutional h-100 p-3 text-center">
+                    <div class="stat-icon resolved mx-auto mb-3">4</div>
+                    <h6 class="fw-bold text-dark">Staff Review & Action</h6>
+                    <p class="small text-muted mb-0">Department officer inspects grievance, moves status from Assigned to In Progress, takes corrective action, and documents remarks.</p>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="card card-institutional h-100 p-3 text-center">
+                    <div class="stat-icon critical mx-auto mb-3">5</div>
+                    <h6 class="fw-bold text-dark">Resolution & Student Feedback</h6>
+                    <p class="small text-muted mb-0">Student monitors the live 4-stage tracking timeline and submits a 1-to-5 star quality satisfaction rating upon closure.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About & Covered Departments Section -->
+<section id="about" class="py-5 bg-white">
+    <div class="container px-lg-4">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6">
+                <span class="text-uppercase fw-bold text-primary small">Statutory Redressal Framework</span>
+                <h3 class="fw-bold text-dark mt-1 mb-3">Institutional Transparency & Accountability</h3>
+                <p class="text-secondary small mb-3">
+                    The portal provides an auditable, transparent mechanism for academic, infrastructural, and administrative redressing. Unlike unstructured email threads or manual paper applications, every grievance submitted is given a permanent immutable ID, timestamped audit log, and tracked performance SLAs.
+                </p>
+                <div class="d-flex flex-column gap-2">
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-shield-lock-fill text-primary mt-1"></i>
+                        <div>
+                            <strong class="d-block text-dark small">Complete Role-Based Security</strong>
+                            <span class="text-muted small">Students only see their own grievances; staff view only their assigned department; administrative oversight monitors campus-wide KPIs.</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <i class="bi bi-lightning-charge-fill text-warning mt-1"></i>
+                        <div>
+                            <strong class="d-block text-dark small">Automated Safety Escalation</strong>
+                            <span class="text-muted small">Physical hazard keywords (sparks, electrical danger, gas leaks, structural collapse) automatically force immediate High-Priority escalation.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card card-institutional p-3">
+                    <h6 class="fw-bold text-dark mb-3 border-bottom pb-2">Active Campus Departments</h6>
+                    <div class="row g-2">
+                        {% for dept in departments %}
+                            <div class="col-sm-6">
+                                <div class="p-2 border rounded bg-light h-100">
+                                    <div class="fw-semibold text-primary small">{{ dept.department_name }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">{{ dept.description[:65] }}...</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

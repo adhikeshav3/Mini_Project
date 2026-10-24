@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Reassign Grievance #{{ grievance.grievance_id }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb small">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}" class="text-decoration-none">Admin Console</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Reassign Grievance #{{ grievance.grievance_id }}</li>
+                </ol>
+            </nav>
+
+            <div class="card card-institutional shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">Reassign Grievance #{{ grievance.grievance_id }}</h4>
+                        <span class="text-muted small">Correct classification mispredictions or adjust department workload manually</span>
+                    </div>
+                    <span class="badge bg-warning text-dark">Admin Override</span>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Complaint Readonly Summary -->
+                    <div class="p-3 bg-light rounded border mb-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="fw-bold text-dark mb-0">{{ grievance.title }}</h5>
+                            <span class="badge bg-light text-dark border">{{ grievance.status }}</span>
+                        </div>
+                        <p class="text-secondary small mb-2">{{ grievance.description }}</p>
+                        <div class="d-flex flex-wrap gap-3 small text-muted pt-2 border-top">
+                            <div><strong>Student:</strong> {{ grievance.student.name }} ({{ grievance.student.email }})</div>
+                            <div><strong>Current Category:</strong> <span class="badge bg-secondary">{{ grievance.predicted_category }}</span></div>
+                            <div><strong>Current Dept:</strong> {{ grievance.assigned_department.department_name if grievance.assigned_department else 'None' }}</div>
+                            <div><strong>Assigned Staff:</strong> {{ grievance.assigned_staff.name if grievance.assigned_staff else 'Unassigned' }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Reassignment Form -->
+                    <form method="POST" action="{{ url_for('admin_reassign', grievance_id=grievance.grievance_id) }}">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="category" class="form-label fw-semibold text-dark">Verified Grievance Category</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="Academic" {% if grievance.predicted_category == 'Academic' %}selected{% endif %}>Academic</option>
+                                    <option value="Examination" {% if grievance.predicted_category == 'Examination' %}selected{% endif %}>Examination</option>
+                                    <option value="Hostel" {% if grievance.predicted_category == 'Hostel' %}selected{% endif %}>Hostel</option>
+                                    <option value="Transport" {% if grievance.predicted_category == 'Transport' %}selected{% endif %}>Transport</option>
+                                    <option value="Infrastructure" {% if grievance.predicted_category == 'Infrastructure' %}selected{% endif %}>Infrastructure</option>
+                                    <option value="Library" {% if grievance.predicted_category == 'Library' %}selected{% endif %}>Library</option>
+                                    <option value="Administration" {% if grievance.predicted_category == 'Administration' %}selected{% endif %}>Administration</option>
+                                    <option value="Other" {% if grievance.predicted_category == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="department_id" class="form-label fw-semibold text-dark">Assigned Responsible Department</label>
+                                <select class="form-select" id="department_id" name="department_id" required>
+                                    {% for d in departments %}
+                                        <option value="{{ d.department_id }}" {% if grievance.assigned_department_id == d.department_id %}selected{% endif %}>
+                                            {{ d.department_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="staff_id" class="form-label fw-semibold text-dark">Assigned Department Officer</label>
+                            <select class="form-select" id="staff_id" name="staff_id" required>
+                                <option value="">-- Select Department Officer --</option>
+                                {% for s in staff_members %}
+                                    <option value="{{ s.user_id }}" {% if grievance.assigned_staff_id == s.user_id %}selected{% endif %}>
+                                        {{ s.name }} ({{ s.department.department_name if s.department else 'General' }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text small">Select the specific officer in charge of investigating this grievance.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="remarks" class="form-label fw-semibold text-dark">Administrative Reassignment Reason / Remarks</label>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="State reason for manual reassignment or category modification..." required></textarea>
+                            <div class="form-text small">This explanation will be permanently recorded in the grievance audit history.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Admin Console
+                            </a>
+                            <button type="submit" class="btn btn-institutional px-4 py-2 shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Save Reassignment Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

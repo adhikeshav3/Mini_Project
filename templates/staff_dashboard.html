@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Department Staff Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h3 class="fw-bold text-dark mb-0">Department Officer Workspace</h3>
+                <span class="badge bg-primary fs-6">{{ department.department_name if department else 'General Staff' }}</span>
+            </div>
+            <p class="text-muted small mb-0">Review incoming complaints, dispatch technical solutions, and record audit remarks</p>
+        </div>
+        <div class="text-muted small">
+            Logged in officer: <strong>{{ current_user.name }}</strong>
+        </div>
+    </div>
+
+    <!-- Staff Department Metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-value">{{ total_count }}</div>
+                    <div class="stat-label">Total Assigned</div>
+                </div>
+                <div class="stat-icon total">
+                    <i class="bi bi-briefcase"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-value">{{ pending_count }}</div>
+                    <div class="stat-label">Pending Action</div>
+                </div>
+                <div class="stat-icon pending">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-value">{{ in_progress_count }}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-icon progress">
+                    <i class="bi bi-tools"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-value">{{ resolved_count }}</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-icon resolved">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card card-institutional mb-4 bg-light">
+        <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small fw-bold text-secondary me-2"><i class="bi bi-funnel me-1"></i> Filter:</span>
+                <a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm {% if not active_filter %}btn-dark{% else %}btn-outline-secondary bg-white{% endif %}">
+                    All Grievances
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='Assigned') }}" class="btn btn-sm {% if active_filter == 'Assigned' %}btn-dark{% else %}btn-outline-secondary bg-white{% endif %}">
+                    Assigned (New)
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='In Progress') }}" class="btn btn-sm {% if active_filter == 'In Progress' %}btn-dark{% else %}btn-outline-secondary bg-white{% endif %}">
+                    In Progress
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='Resolved') }}" class="btn btn-sm {% if active_filter == 'Resolved' %}btn-dark{% else %}btn-outline-secondary bg-white{% endif %}">
+                    Resolved
+                </a>
+            </div>
+            <div class="text-muted small">
+                Showing {{ grievances|length }} assigned case(s)
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Grievances Table -->
+    <div class="card card-institutional shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark"><i class="bi bi-inbox-fill text-primary me-2"></i>Assigned Department Complaints</span>
+            <span class="badge bg-light text-secondary border small">Real-Time SQLite Queue</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-uppercase text-secondary">
+                        <tr>
+                            <th class="ps-3" style="width: 75px;">ID</th>
+                            <th>Complaint Details</th>
+                            <th>Student</th>
+                            <th>AI Category</th>
+                            <th>Urgency</th>
+                            <th>Status</th>
+                            <th>Logged At</th>
+                            <th class="text-end pe-3">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if grievances %}
+                            {% for g in grievances %}
+                                <tr>
+                                    <td class="ps-3 fw-bold text-primary">#{{ g.grievance_id }}</td>
+                                    <td>
+                                        <div class="fw-semibold text-dark">{{ g.title }}</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 320px;">{{ g.description }}</div>
+                                        {% if g.attachment_path %}
+                                            <span class="badge bg-light text-secondary border mt-1" style="font-size: 0.68rem;">
+                                                <i class="bi bi-paperclip me-1"></i> Attachment attached
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small">
+                                        <div class="fw-semibold">{{ g.student.name if g.student else 'Unknown' }}</div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">{{ g.student.email if g.student else '' }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ g.predicted_category }}</span>
+                                    </td>
+                                    <td>
+                                        {% if g.predicted_priority == 'High' %}
+                                            <span class="badge badge-status badge-priority-high">High</span>
+                                        {% elif g.predicted_priority == 'Medium' %}
+                                            <span class="badge badge-status badge-priority-medium">Medium</span>
+                                        {% else %}
+                                            <span class="badge badge-status badge-priority-low">Low</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if g.status == 'Resolved' %}
+                                            <span class="badge badge-status badge-status-resolved">Resolved</span>
+                                        {% elif g.status == 'In Progress' %}
+                                            <span class="badge badge-status badge-status-in-progress">In Progress</span>
+                                        {% elif g.status == 'Assigned' %}
+                                            <span class="badge badge-status badge-status-assigned">Assigned</span>
+                                        {% else %}
+                                            <span class="badge badge-status badge-status-submitted">Submitted</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y %H:%M') if g.created_at else '' }}</td>
+                                    <td class="text-end pe-3">
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('grievance_details', grievance_id=g.grievance_id) }}" class="btn btn-sm btn-outline-institutional py-1 px-2">
+                                                <i class="bi bi-pencil-square me-1"></i> Review & Update
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
+                                    No grievances currently pending in this queue. Great job!
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
