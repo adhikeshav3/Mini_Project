@@ -11,7 +11,7 @@ if BASE_DIR not in sys.path:
 import secrets
 from markupsafe import Markup
 from flask import (
-    Flask, render_template, request, redirect, url_for, flash, jsonify, abort, session
+    Flask, render_template, request, redirect, url_for, flash, jsonify, abort, session, send_from_directory
 )
 from flask_login import (
     LoginManager, login_user, logout_user, login_required, current_user
@@ -29,9 +29,16 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Ensure necessary directories exist
-os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(Config.MODELS_DIR, exist_ok=True)
-os.makedirs(Config.DB_DIR, exist_ok=True)
+try:
+    os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+    os.makedirs(Config.MODELS_DIR, exist_ok=True)
+    os.makedirs(Config.DB_DIR, exist_ok=True)
+except Exception:
+    pass
+
+@app.route('/static/uploads/<path:filename>')
+def serve_custom_upload(filename):
+    return send_from_directory(Config.UPLOAD_FOLDER, filename)
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -720,6 +727,9 @@ def internal_error(error):
 def setup_app():
     init_db()
     seed_demo_data()
+
+# Auto-initialize database & seed data on import (WSGI/Vercel serverless cold start)
+setup_app()
 
 if __name__ == '__main__':
     setup_app()

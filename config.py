@@ -9,13 +9,34 @@ class Config:
     WTF_CSRF_ENABLED = True
     
     # Database
-    DB_DIR = os.path.join(BASE_DIR, 'database')
-    os.makedirs(DB_DIR, exist_ok=True)
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(DB_DIR, 'grievance.db')}"
+    IS_VERCEL = os.environ.get('VERCEL') == '1' or os.environ.get('VERCEL_ENV') is not None
+    
+    if IS_VERCEL:
+        DB_DIR = '/tmp'
+        DB_PATH = os.path.join(DB_DIR, 'grievance.db')
+        seed_db = os.path.join(BASE_DIR, 'database', 'grievance.db')
+        if not os.path.exists(DB_PATH) and os.path.exists(seed_db):
+            try:
+                import shutil
+                shutil.copyfile(seed_db, DB_PATH)
+            except Exception:
+                pass
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
+        UPLOAD_FOLDER = os.path.join('/tmp', 'uploads')
+        try:
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        except Exception:
+            pass
+    else:
+        DB_DIR = os.path.join(BASE_DIR, 'database')
+        os.makedirs(DB_DIR, exist_ok=True)
+        SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(DB_DIR, 'grievance.db')}"
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Uploads
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+    # Upload limits
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MB max file upload
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
     
