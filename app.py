@@ -192,17 +192,14 @@ def student_dashboard():
 @app.route('/student/submit', methods=['GET', 'POST'])
 @role_required('student')
 def submit_grievance():
-    departments = db_session.query(Department).all()
-
     if request.method == 'POST':
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
-        suggested_category = request.form.get('suggested_category', '').strip()
         file_obj = request.files.get('attachment')
 
         if not title or not description:
-            flash("Please provide both a title and detailed description for your grievance.", "warning")
-            return render_template('submit_grievance.html', departments=departments)
+            flash("Please provide a title and description for your grievance.", "warning")
+            return redirect(url_for('student_dashboard'))
 
         try:
             grievance, duplicates = GrievanceService.submit_grievance(
@@ -213,26 +210,15 @@ def submit_grievance():
                 file_obj=file_obj
             )
 
-            dept_name = grievance.assigned_department.department_name if grievance.assigned_department else 'Administrative Office'
-            success_msg = (
-                f"Grievance docket #{grievance.grievance_id} registered successfully. "
-                f"Domain: '{grievance.predicted_category}', Priority: '{grievance.predicted_priority}'. "
-                f"Dispatched to {dept_name} for official review."
-            )
-            flash(success_msg, "success")
-
-            if duplicates:
-                flash(
-                    f"Notice: The system identified {len(duplicates)} related grievance(s) already logged in the institutional register.",
-                    "info"
-                )
-
-            return redirect(url_for('grievance_details', grievance_id=grievance.grievance_id))
+            dept_name = grievance.assigned_department.department_name if grievance.assigned_department else 'Support Cell'
+            flash(f"Grievance #{grievance.grievance_id} submitted successfully! Automatically routed to {dept_name}.", "success")
+            return redirect(url_for('student_dashboard'))
 
         except Exception as e:
-            flash(f"Error processing your grievance: {str(e)}", "danger")
+            flash(f"Error submitting grievance: {str(e)}", "danger")
+            return redirect(url_for('student_dashboard'))
 
-    return render_template('submit_grievance.html', departments=departments)
+    return render_template('submit_grievance.html')
 
 @app.route('/student/history')
 @role_required('student')

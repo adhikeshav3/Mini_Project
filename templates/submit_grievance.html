@@ -3,7 +3,7 @@
 {% block title %}Submit Grievance{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 760px;">
+<div class="container py-4" style="max-width: 680px;">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold text-dark mb-0">Submit Grievance</h4>
         <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary">
@@ -16,44 +16,25 @@
             <!-- Title -->
             <div class="mb-3">
                 <label for="title" class="form-label fw-semibold text-dark small">Grievance Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Broken projector in Room 204" required autofocus>
-            </div>
-
-            <!-- Category (Optional) -->
-            <div class="mb-3">
-                <label for="suggested_category" class="form-label fw-semibold text-dark small">
-                    Category Suggestion <span class="text-muted fw-normal">(Optional)</span>
-                </label>
-                <select class="form-select form-select-sm" id="suggested_category" name="suggested_category">
-                    <option value="" selected>Auto-Detect via AI (Recommended)</option>
-                    <option value="Academic">Academic</option>
-                    <option value="Examination">Examination</option>
-                    <option value="Hostel">Hostel</option>
-                    <option value="Transport">Transport</option>
-                    <option value="Infrastructure">Infrastructure</option>
-                    <option value="Library">Library</option>
-                    <option value="Administration">Administration</option>
-                    <option value="Other">Other</option>
-                </select>
-                <div class="form-text small">If left blank, AI models will automatically detect the category and priority.</div>
+                <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Water cooler leaking on 2nd floor" required autofocus>
             </div>
 
             <!-- Description -->
             <div class="mb-3">
-                <label for="description" class="form-label fw-semibold text-dark small">Detailed Description <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="description" name="description" rows="5" placeholder="Explain the problem clearly with room number, location, or details..." required></textarea>
+                <label for="description" class="form-label fw-semibold text-dark small">Description <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Briefly describe what the problem is and where it is located..." required></textarea>
             </div>
 
             <!-- File Upload -->
             <div class="mb-4">
                 <label for="attachment" class="form-label fw-semibold text-dark small">
-                    Supporting Image or Document <span class="text-muted fw-normal">(Optional: PNG, JPG, PDF)</span>
+                    Supporting Photo or Document <span class="text-muted fw-normal">(Optional)</span>
                 </label>
                 <input class="form-control form-control-sm" type="file" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.pdf">
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                <span class="text-muted small">Priority is estimated automatically.</span>
+                <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary">Cancel</a>
                 <button type="submit" class="btn btn-portal px-4 py-2">
                     <i class="bi bi-send me-1"></i> Submit Grievance
                 </button>

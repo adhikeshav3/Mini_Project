@@ -65,6 +65,37 @@
         </div>
     </div>
 
+    <!-- Quick Submit Form Directly on Dashboard -->
+    <div class="card card-simple p-4 shadow-sm mb-4">
+        <h6 class="fw-bold text-dark mb-3">
+            <i class="bi bi-pencil-square text-primary me-2"></i>Submit a New Grievance
+        </h6>
+        <form method="POST" action="{{ url_for('submit_grievance') }}" enctype="multipart/form-data">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold text-dark">Complaint Title <span class="text-danger">*</span></label>
+                    <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. Projector not working in Room 204" required>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label small fw-semibold text-dark">Description <span class="text-danger">*</span></label>
+                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Describe the problem and location clearly..." required>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-portal btn-sm w-100 py-2">
+                        <i class="bi bi-send me-1"></i> Submit
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2 d-flex align-items-center gap-2">
+                <label for="dash-file" class="btn btn-light btn-sm border py-0 px-2 text-muted" style="font-size: 0.78rem; cursor: pointer;">
+                    <i class="bi bi-paperclip me-1"></i> Attach Photo/Document (Optional)
+                </label>
+                <input type="file" id="dash-file" name="attachment" class="d-none" onchange="document.getElementById('dash-file-name').textContent = this.files[0] ? this.files[0].name : ''">
+                <span id="dash-file-name" class="small text-muted" style="font-size: 0.75rem;"></span>
+            </div>
+        </form>
+    </div>
+
     <!-- Recent Grievances Card -->
     <div class="card card-simple shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
