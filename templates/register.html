@@ -3,51 +3,45 @@
 {% block title %}Student Registration{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card card-institutional shadow-sm border-0">
-                <div class="card-header bg-white text-center py-4 border-bottom">
-                    <div class="brand-crest mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.4rem;">
-                        <i class="bi bi-person-plus-fill"></i>
-                    </div>
-                    <h4 class="fw-bold text-dark mb-1">Student Registration</h4>
-                    <p class="text-muted small mb-0">Create an account to submit and monitor grievances</p>
-                </div>
-                <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('register') }}">
-                        <div class="mb-3">
-                            <label for="name" class="form-label small fw-semibold text-dark">Full Name</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. John Doe" required autofocus>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label small fw-semibold text-dark">Institutional Email</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="e.g. jdoe@college.edu" required>
-                            <div class="form-text small">Use your official college or personal student email.</div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label small fw-semibold text-dark">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Create strong password" required minlength="6">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="confirm_password" class="form-label small fw-semibold text-dark">Confirm Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required minlength="6">
-                        </div>
-
-                        <button type="submit" class="btn btn-institutional w-100 py-2 fw-semibold">
-                            <i class="bi bi-check-circle me-1"></i> Register Student Account
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-3 pt-3 border-top">
-                        <span class="text-muted small">Already registered? </span>
-                        <a href="{{ url_for('login') }}" class="small fw-semibold text-primary">Login to Portal</a>
-                    </div>
-                </div>
+<div class="container py-5" style="max-width: 480px;">
+    <div class="card card-simple p-4 shadow-sm">
+        <div class="text-center mb-4">
+            <div class="brand-icon mx-auto mb-2" style="width: 48px; height: 48px;">
+                <i class="bi bi-person-plus-fill fs-4"></i>
             </div>
+            <h4 class="fw-bold text-dark mb-1">Student Registration</h4>
+            <p class="text-muted small mb-0">Create an account to submit and track grievances</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="mb-3">
+                <label for="name" class="form-label small fw-semibold text-dark">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label small fw-semibold text-dark">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="student@college.edu" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label small fw-semibold text-dark">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required minlength="6">
+            </div>
+
+            <div class="mb-4">
+                <label for="confirm_password" class="form-label small fw-semibold text-dark">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="••••••••" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-portal w-100 py-2">
+                Register Account
+            </button>
+        </form>
+
+        <div class="text-center mt-3 pt-3 border-top small">
+            <span class="text-muted">Already registered? </span>
+            <a href="{{ url_for('login') }}" class="fw-semibold text-primary">Login here</a>
         </div>
     </div>
 </div>

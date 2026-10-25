@@ -24,7 +24,7 @@ This project delivers an **Intelligent Student Grievance Resolution Agent** that
   - **Sentiment Analysis**: TF-IDF + Logistic Regression analyzing student emotional tone (`Negative`, `Neutral`, `Positive`).
   - **Duplicate Detection**: TF-IDF vectorization with Cosine Similarity matching open complaints (flagged for admin review without silent auto-merges).
   - **Intelligent Routing & Workload Balancing**: Dispatches grievances to responsible departments and assigns the staff officer with the lowest active workload.
-- **Real-Time Interactive Assistant**: Live prediction preview as students draft grievances in the browser.
+- **Simplified Institutional Submission**: Clean, intuitive form for students with genuine AI inference, automated triage, and timeline tracking upon submission.
 - **Interactive Visual Tracking**: 4-stage visual timeline (`Submitted` → `Assigned` → `In Progress` → `Resolved`) with immutable timestamped audit history.
 - **Student Resolution Feedback**: 5-star rating and satisfaction comments upon grievance resolution.
 - **Dynamic Administrator Analytics**: Real-time Chart.js dashboards directly mapped to live SQLite database records (Categories, Department volume, Priorities, Monthly inflow, Resolution SLA).
