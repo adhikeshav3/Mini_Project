@@ -1,68 +1,113 @@
 {% extends "base.html" %}
 
-{% block title %}Login | Student Grievance Portal{% endblock %}
+{% block title %}Sign In | Student Grievance Redressal Portal{% endblock %}
 
 {% block content %}
 <div class="container py-5" style="max-width: 480px;">
-    <div class="card card-simple p-4 shadow-sm">
+    <!-- Institutional Sign-in Card -->
+    <div class="card card-simple p-4 shadow-sm bg-white">
         <div class="text-center mb-4">
-            <div class="brand-icon mx-auto mb-2" style="width: 48px; height: 48px;">
-                <i class="bi bi-lock-fill fs-4"></i>
+            <div class="brand-icon mx-auto mb-2" style="width: 48px; height: 48px; background-color: var(--portal-navy);">
+                <i class="bi bi-shield-lock-fill text-white fs-4"></i>
             </div>
-            <h4 class="fw-bold text-dark mb-1">Portal Login</h4>
-            <p class="text-muted small mb-0">Sign in using your institutional email & password</p>
+            <h4 class="fw-bold text-dark mb-1">Institutional Portal Login</h4>
+            <p class="text-muted small mb-0">Single Sign-On for Students, Staff, and Administrators</p>
         </div>
 
         {% if current_user.is_authenticated %}
         <div class="alert alert-info py-2 small mb-3 text-start">
             <i class="bi bi-info-circle me-1"></i> You are currently signed in as <strong>{{ current_user.name }}</strong> ({{ current_user.role|capitalize }}). 
-            <a href="{% if current_user.role == 'student' %}{{ url_for('student_dashboard') }}{% elif current_user.role == 'staff' %}{{ url_for('staff_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" class="alert-link fw-semibold">Go to Dashboard</a> or log in with another account below.
+            <a href="{% if current_user.role == 'student' %}{{ url_for('student_dashboard') }}{% elif current_user.role == 'staff' %}{{ url_for('staff_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" class="alert-link fw-semibold">Go to Dashboard</a> or authenticate with another account below.
         </div>
         {% endif %}
 
         <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="mb-3">
-                <label for="email" class="form-label small fw-semibold text-dark">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="student@college.edu" required autofocus>
+                <label for="email" class="form-label small fw-semibold text-dark">Institutional Email ID</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control border-start-0" id="email" name="email" placeholder="student@college.edu" required autofocus>
+                </div>
             </div>
 
             <div class="mb-4">
-                <label for="password" class="form-label small fw-semibold text-dark">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+                <label for="password" class="form-label small fw-semibold text-dark">Account Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control border-start-0 border-end-0" id="password" name="password" placeholder="••••••••" required>
+                    <button class="btn btn-outline-secondary border-start-0" type="button" onclick="togglePasswordVisibility('password', this)" title="Show/Hide Password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-portal w-100 py-2">
-                Login to Portal
+                <i class="bi bi-box-arrow-in-right me-1"></i> Authenticate & Enter Portal
             </button>
         </form>
 
         <div class="text-center mt-3 pt-3 border-top small">
-            <span class="text-muted">Don't have an account? </span>
-            <a href="{{ url_for('register') }}" class="fw-semibold text-primary">Register as Student</a>
+            <span class="text-muted">New student at Apex Institute? </span>
+            <a href="{{ url_for('register') }}" class="fw-semibold text-primary">Register Account</a>
         </div>
     </div>
 
     <!-- 1-Click Demo Login Helper for Testing & Viva Evaluation -->
-    <div class="card card-simple mt-3 p-3 bg-light text-center">
-        <div class="small fw-bold text-dark mb-2">Quick Demo Accounts:</div>
+    <div class="card card-simple mt-3 p-3 bg-light text-center border">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small fw-bold text-dark"><i class="bi bi-person-badge me-1 text-primary"></i>Demo Credential Quick-Fill:</span>
+            <span class="badge bg-secondary" style="font-size: 0.68rem;">Evaluation Mode</span>
+        </div>
         <div class="d-flex justify-content-center gap-2 flex-wrap">
-            <button class="btn btn-sm btn-outline-secondary bg-white" onclick="fillCreds('student@college.edu', 'student123')">
-                <i class="bi bi-person me-1"></i> Student
+            <button class="btn btn-sm btn-outline-secondary bg-white text-dark shadow-xs" onclick="fillCreds('student@college.edu', 'student123')" type="button">
+                <i class="bi bi-person me-1 text-primary"></i> Student
             </button>
-            <button class="btn btn-sm btn-outline-secondary bg-white" onclick="fillCreds('maintenance@college.edu', 'staff123')">
-                <i class="bi bi-tools me-1"></i> Staff
+            <button class="btn btn-sm btn-outline-secondary bg-white text-dark shadow-xs" onclick="fillCreds('maintenance@college.edu', 'staff123')" type="button">
+                <i class="bi bi-tools me-1 text-warning"></i> Staff (Maint.)
             </button>
-            <button class="btn btn-sm btn-outline-secondary bg-white" onclick="fillCreds('admin@college.edu', 'admin123')">
-                <i class="bi bi-shield me-1"></i> Admin
+            <button class="btn btn-sm btn-outline-secondary bg-white text-dark shadow-xs" onclick="fillCreds('admin@college.edu', 'admin123')" type="button">
+                <i class="bi bi-shield-lock me-1 text-danger"></i> Administrator
             </button>
         </div>
+        <div class="mt-2 text-muted" style="font-size: 0.72rem;">
+            Clicking fills credentials automatically. Click "Authenticate" to sign in.
+        </div>
+    </div>
+
+    <div class="text-center mt-3 text-muted small" style="font-size: 0.75rem;">
+        <i class="bi bi-lock me-1"></i> Secured with 256-bit Institutional TLS Encryption
     </div>
 </div>
 
 <script>
 function fillCreds(email, pwd) {
-    document.getElementById('email').value = email;
-    document.getElementById('password').value = pwd;
+    var emailInput = document.getElementById('email');
+    var pwdInput = document.getElementById('password');
+    if (emailInput && pwdInput) {
+        emailInput.value = email;
+        pwdInput.value = pwd;
+    }
+}
+
+function togglePasswordVisibility(fieldId, btn) {
+    var field = document.getElementById(fieldId);
+    if (!field) return;
+    var icon = btn.querySelector('i');
+    if (field.type === 'password') {
+        field.type = 'text';
+        if (icon) {
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    } else {
+        field.type = 'password';
+        if (icon) {
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
 }
 </script>
 {% endblock %}

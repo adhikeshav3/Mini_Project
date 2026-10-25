@@ -1,47 +1,62 @@
 {% extends "base.html" %}
 
-{% block title %}Student Registration{% endblock %}
+{% block title %}Student Registration | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
-<div class="container py-5" style="max-width: 480px;">
-    <div class="card card-simple p-4 shadow-sm">
+<div class="container py-5" style="max-width: 500px;">
+    <div class="card card-simple p-4 shadow-sm bg-white">
         <div class="text-center mb-4">
-            <div class="brand-icon mx-auto mb-2" style="width: 48px; height: 48px;">
-                <i class="bi bi-person-plus-fill fs-4"></i>
+            <div class="brand-icon mx-auto mb-2" style="width: 48px; height: 48px; background-color: var(--portal-navy);">
+                <i class="bi bi-person-plus-fill text-white fs-4"></i>
             </div>
-            <h4 class="fw-bold text-dark mb-1">Student Registration</h4>
-            <p class="text-muted small mb-0">Create an account to submit and track grievances</p>
+            <h4 class="fw-bold text-dark mb-1">Student Account Registration</h4>
+            <p class="text-muted small mb-0">Register your institutional profile to file & monitor grievances</p>
         </div>
 
         <form method="POST" action="{{ url_for('register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="mb-3">
-                <label for="name" class="form-label small fw-semibold text-dark">Full Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required autofocus>
+                <label for="name" class="form-label small fw-semibold text-dark">Full Legal Name <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control border-start-0" id="name" name="name" placeholder="e.g. Priya Sharma" required autofocus>
+                </div>
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label small fw-semibold text-dark">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="student@college.edu" required>
+                <label for="email" class="form-label small fw-semibold text-dark">University Email Address <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control border-start-0" id="email" name="email" placeholder="student.name@college.edu" required>
+                </div>
+                <div class="form-text small" style="font-size: 0.75rem;">Must be an active email address for grievance notifications.</div>
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label small fw-semibold text-dark">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required minlength="6">
+                <label for="password" class="form-label small fw-semibold text-dark">Create Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+                </div>
             </div>
 
             <div class="mb-4">
-                <label for="confirm_password" class="form-label small fw-semibold text-dark">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="••••••••" required minlength="6">
+                <label for="confirm_password" class="form-label small fw-semibold text-dark">Confirm Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-check-circle"></i></span>
+                    <input type="password" class="form-control border-start-0" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required minlength="6">
+                </div>
             </div>
 
             <button type="submit" class="btn btn-portal w-100 py-2">
-                Register Account
+                <i class="bi bi-check2-circle me-1"></i> Register Student Account
             </button>
         </form>
 
         <div class="text-center mt-3 pt-3 border-top small">
-            <span class="text-muted">Already registered? </span>
-            <a href="{{ url_for('login') }}" class="fw-semibold text-primary">Login here</a>
+            <span class="text-muted">Already registered with the portal? </span>
+            <a href="{{ url_for('login') }}" class="fw-semibold text-primary">Sign in here</a>
         </div>
     </div>
 </div>

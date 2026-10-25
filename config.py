@@ -5,6 +5,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 class Config:
     BASE_DIR = BASE_DIR
     SECRET_KEY = os.environ.get('SECRET_KEY', 'college-grievance-secret-key-2026-secure')
+    DEBUG = os.environ.get('FLASK_DEBUG', 'False').lower() in ('true', '1')
+    WTF_CSRF_ENABLED = True
     
     # Database
     DB_DIR = os.path.join(BASE_DIR, 'database')

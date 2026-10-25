@@ -1,35 +1,61 @@
 {% extends "base.html" %}
 
-{% block title %}Grievance #{{ grievance.grievance_id }} Details{% endblock %}
+{% block title %}Grievance #{{ grievance.grievance_id }} Dossier | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h4 class="fw-bold text-dark mb-0">Grievance #{{ grievance.grievance_id }}</h4>
-            <span class="text-muted small">Submitted on {{ grievance.created_at.strftime('%d %b %Y, %I:%M %p') if grievance.created_at else '' }}</span>
-        </div>
-        <div>
+    <!-- Breadcrumb & Back Navigation -->
+    <nav aria-label="breadcrumb" class="mb-2">
+        <ol class="breadcrumb small">
             {% if current_user.role == 'student' %}
-                <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">Back to List</a>
+                <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}" class="text-primary">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('student_history') }}" class="text-primary">My Grievances</a></li>
             {% elif current_user.role == 'staff' %}
-                <a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm btn-outline-secondary">Back to Queue</a>
+                <li class="breadcrumb-item"><a href="{{ url_for('staff_dashboard') }}" class="text-primary">Staff Queue</a></li>
             {% else %}
-                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">Back to Admin</a>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}" class="text-primary">Admin Console</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">Ticket #{{ grievance.grievance_id }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <h4 class="fw-bold text-dark mb-0">Ticket Dossier #{{ grievance.grievance_id }}</h4>
+                {% if grievance.predicted_priority == 'High' %}
+                    <span class="badge badge-clean badge-priority-high"><i class="bi bi-exclamation-triangle-fill me-1"></i>High Priority</span>
+                {% endif %}
+            </div>
+            <span class="text-muted small">Lodged on {{ grievance.created_at.strftime('%d %b %Y, %I:%M %p') if grievance.created_at else '' }}</span>
+        </div>
+        <div class="mt-2 mt-md-0">
+            {% if current_user.role == 'student' %}
+                <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to History
+                </a>
+            {% elif current_user.role == 'staff' %}
+                <a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Queue
+                </a>
+            {% else %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Console
+                </a>
             {% endif %}
         </div>
     </div>
 
-    <!-- Status Tracker Bar (Prompt Section 7) -->
+    <!-- 4-Stage Redressal Stepper Bar -->
     {% set s = grievance.status %}
-    <div class="card card-simple p-3 mb-4 shadow-sm">
+    <div class="card card-simple p-3 mb-4 shadow-sm bg-white">
         <div class="step-tracker">
             <!-- Step 1: Submitted -->
             <div class="tracker-node {% if s in ['Submitted', 'Assigned', 'In Progress', 'Resolved'] %}completed{% endif %}">
                 <div class="tracker-dot">
                     <i class="bi bi-check-lg"></i>
                 </div>
-                <div class="tracker-title">Submitted</div>
+                <div class="tracker-title">1. Lodged</div>
                 <div class="tracker-sub">{{ grievance.created_at.strftime('%d %b') if grievance.created_at else '' }}</div>
             </div>
 
@@ -38,7 +64,7 @@
                 <div class="tracker-dot">
                     {% if s in ['Assigned', 'In Progress', 'Resolved'] %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}
                 </div>
-                <div class="tracker-title">Assigned</div>
+                <div class="tracker-title">2. Assigned</div>
                 <div class="tracker-sub">{{ grievance.assigned_department.department_name if grievance.assigned_department else 'Pending' }}</div>
             </div>
 
@@ -47,8 +73,8 @@
                 <div class="tracker-dot">
                     {% if s in ['In Progress', 'Resolved'] %}<i class="bi bi-check-lg"></i>{% else %}3{% endif %}
                 </div>
-                <div class="tracker-title">In Progress</div>
-                <div class="tracker-sub">Under Review</div>
+                <div class="tracker-title">3. Under Review</div>
+                <div class="tracker-sub">On-site Action</div>
             </div>
 
             <!-- Step 4: Resolved -->
@@ -56,166 +82,210 @@
                 <div class="tracker-dot">
                     {% if s == 'Resolved' %}<i class="bi bi-check2-all"></i>{% else %}4{% endif %}
                 </div>
-                <div class="tracker-title">Resolved</div>
+                <div class="tracker-title">4. Resolved</div>
                 <div class="tracker-sub">{{ grievance.resolved_at.strftime('%d %b') if grievance.resolved_at else 'Pending' }}</div>
             </div>
         </div>
     </div>
 
     <div class="row g-4">
-        <!-- Left: Details & History -->
+        <!-- Main Column: Complaint Dossier, Timeline & Feedback -->
         <div class="col-lg-8">
-            <!-- Complaint Text Card -->
-            <div class="card card-simple p-4 shadow-sm mb-4">
+            <!-- Complaint Summary Card -->
+            <div class="card card-simple p-4 shadow-sm mb-4 bg-white">
                 <div class="d-flex justify-content-between align-items-start mb-2">
                     <h5 class="fw-bold text-dark mb-0">{{ grievance.title }}</h5>
                     {% if grievance.status == 'Resolved' %}
-                        <span class="badge badge-clean badge-resolved fs-6">Resolved</span>
+                        <span class="badge badge-clean badge-resolved fs-6"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
                     {% elif grievance.status == 'In Progress' %}
-                        <span class="badge badge-clean badge-progress fs-6">In Progress</span>
+                        <span class="badge badge-clean badge-progress fs-6"><i class="bi bi-gear-fill me-1"></i>In Progress</span>
                     {% elif grievance.status == 'Assigned' %}
-                        <span class="badge badge-clean badge-assigned fs-6">Assigned</span>
+                        <span class="badge badge-clean badge-assigned fs-6"><i class="bi bi-person-check-fill me-1"></i>Assigned</span>
                     {% else %}
-                        <span class="badge badge-clean badge-submitted fs-6">Submitted</span>
+                        <span class="badge badge-clean badge-submitted fs-6"><i class="bi bi-clock me-1"></i>Submitted</span>
                     {% endif %}
                 </div>
 
-                <div class="text-muted small mb-3">
-                    By <strong>{{ grievance.student.name if grievance.student else 'Unknown' }}</strong> ({{ grievance.student.email if grievance.student else '' }})
+                <div class="text-muted small mb-3 pb-2 border-bottom">
+                    Lodged by: <strong>{{ grievance.student.name if grievance.student else 'Anonymous/Unknown' }}</strong>
+                    <span class="text-secondary">({{ grievance.student.email if grievance.student else '' }})</span>
                 </div>
 
-                <p class="text-dark mb-3" style="line-height: 1.6; white-space: pre-wrap;">{{ grievance.description }}</p>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Complaint Statement & Location</label>
+                    <p class="text-dark mb-0" style="line-height: 1.65; white-space: pre-wrap; font-size: 0.95rem;">{{ grievance.description }}</p>
+                </div>
 
                 {% if grievance.attachment_path %}
-                    <div class="p-2 border rounded bg-light d-flex justify-content-between align-items-center">
-                        <span class="small text-muted"><i class="bi bi-paperclip me-1"></i> Attachment: {{ grievance.attachment_path }}</span>
-                        <a href="{{ url_for('static', filename='uploads/' + grievance.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2">
-                            View File
+                    <div class="p-3 border rounded bg-light d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-paperclip fs-5 text-primary"></i>
+                            <div>
+                                <div class="small fw-semibold text-dark">Supporting Documentation Attached</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ grievance.attachment_path }}</div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('static', filename='uploads/' + grievance.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-primary py-1 px-3">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> View Attachment
                         </a>
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Status History Log (Prompt Section 8) -->
-            <div class="card card-simple shadow-sm mb-4">
-                <div class="card-header bg-white">
-                    <span class="fw-bold text-dark"><i class="bi bi-clock-history me-2 text-primary"></i>Status Updates & Remarks</span>
+            <!-- Chronological Audit Trail & Status Updates History -->
+            <div class="card card-simple shadow-sm mb-4 bg-white">
+                <div class="card-header bg-white py-3">
+                    <span class="fw-bold text-dark"><i class="bi bi-clock-history me-2 text-primary"></i>Official Resolution Timeline & Remarks</span>
                 </div>
                 <div class="card-body p-4">
-                    {% for h in grievance.status_history %}
-                        <div class="history-entry">
-                            <div class="d-flex justify-content-between align-items-baseline mb-1">
-                                <span class="fw-semibold text-dark small">
-                                    {{ h.new_status }}
-                                    <span class="text-muted fw-normal">by {{ h.updater.name if h.updater else 'System' }}</span>
-                                </span>
-                                <span class="text-muted small" style="font-size: 0.72rem;">
-                                    {{ h.updated_at.strftime('%d %b %Y, %I:%M %p') }}
-                                </span>
+                    {% if grievance.status_history %}
+                        {% for h in grievance.status_history %}
+                            <div class="history-entry">
+                                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                    <span class="fw-semibold text-dark small">
+                                        <span class="badge bg-light text-primary border me-1">{{ h.new_status }}</span>
+                                        <span class="text-muted fw-normal">&bull; Updated by <strong>{{ h.updater.name if h.updater else 'System Engine' }}</strong></span>
+                                    </span>
+                                    <span class="text-muted small" style="font-size: 0.75rem;">
+                                        {{ h.updated_at.strftime('%d %b %Y, %I:%M %p') }}
+                                    </span>
+                                </div>
+                                <p class="text-dark small mb-0 mt-1" style="line-height: 1.5;">{{ h.remarks }}</p>
                             </div>
-                            <p class="text-muted small mb-0">{{ h.remarks }}</p>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small mb-0">No historical updates recorded yet.</p>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Student Feedback (Prompt Section 7) -->
+            <!-- Student Resolution Feedback Section -->
             {% if grievance.status == 'Resolved' %}
-                <div class="card card-simple p-4 shadow-sm mb-4">
-                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Student Feedback</h6>
+                <div class="card card-simple p-4 shadow-sm mb-4 bg-white">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-star-fill text-warning me-2"></i>Student Resolution Feedback</h6>
                     {% if grievance.feedback %}
                         <div class="p-3 bg-light rounded border">
                             <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="fw-bold small text-dark">Rating:</span>
-                                <div class="text-warning">
+                                <span class="fw-bold small text-dark">Satisfaction Rating:</span>
+                                <div class="text-warning fs-5">
                                     {% for i in range(grievance.feedback.rating) %}★{% endfor %}
                                     {% for i in range(5 - grievance.feedback.rating) %}☆{% endfor %}
                                 </div>
-                                <span class="badge bg-success ms-2">{{ grievance.feedback.rating }}/5</span>
+                                <span class="badge bg-success ms-2">{{ grievance.feedback.rating }} / 5 Stars</span>
                             </div>
-                            <p class="small text-muted mb-1">"{{ grievance.feedback.comments or 'No comments provided.' }}"</p>
-                            <span class="text-muted small" style="font-size: 0.7rem;">Submitted on {{ grievance.feedback.submitted_at.strftime('%d %b %Y') }}</span>
+                            <p class="small text-dark mb-1">"{{ grievance.feedback.comments or 'No written feedback provided.' }}"</p>
+                            <span class="text-muted small" style="font-size: 0.72rem;">Submitted on {{ grievance.feedback.submitted_at.strftime('%d %b %Y, %I:%M %p') }}</span>
                         </div>
                     {% elif current_user.role == 'student' and current_user.user_id == grievance.student_id %}
                         <form method="POST" action="{{ url_for('submit_feedback', grievance_id=grievance.grievance_id) }}">
-                            <p class="small text-muted mb-2">How satisfied are you with this resolution?</p>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <p class="small text-muted mb-2">This ticket has been marked resolved. Please rate the speed and effectiveness of this redressal:</p>
                             <div class="row g-2 align-items-center mb-2">
-                                <div class="col-auto">
+                                <div class="col-md-4">
                                     <select class="form-select form-select-sm" name="rating" required>
-                                        <option value="5">5 - Excellent</option>
-                                        <option value="4">4 - Good</option>
-                                        <option value="3" selected>3 - Satisfactory</option>
-                                        <option value="2">2 - Needs Improvement</option>
-                                        <option value="1">1 - Poor</option>
+                                        <option value="5">5 - Outstanding Resolution</option>
+                                        <option value="4">4 - Good / Satisfactory</option>
+                                        <option value="3" selected>3 - Acceptable</option>
+                                        <option value="2">2 - Substandard</option>
+                                        <option value="1">1 - Unsatisfactory</option>
                                     </select>
                                 </div>
-                                <div class="col">
-                                    <input type="text" class="form-control form-control-sm" name="comments" placeholder="Optional comments...">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control form-control-sm" name="comments" placeholder="Additional feedback or remarks (optional)...">
                                 </div>
-                                <div class="col-auto">
-                                    <button type="submit" class="btn btn-sm btn-portal">Submit Rating</button>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-sm btn-portal w-100">Submit Rating</button>
                                 </div>
                             </div>
                         </form>
                     {% else %}
-                        <p class="text-muted small mb-0">No feedback submitted yet.</p>
+                        <p class="text-muted small mb-0"><i class="bi bi-hourglass-split me-1"></i> Awaiting student satisfaction rating and feedback.</p>
                     {% endif %}
                 </div>
             {% endif %}
         </div>
 
-        <!-- Right Sidebar: Info & Staff Action -->
+        <!-- Sidebar: AI Triage Dossier & Staff Action Controls -->
         <div class="col-lg-4">
-            <!-- Summary Box -->
-            <div class="card card-simple p-3 shadow-sm mb-4">
-                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Case Information</h6>
+            <!-- AI Engine Triage Dossier -->
+            <div class="card card-simple p-3 shadow-sm mb-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-cpu text-primary me-2"></i>Triage Dossier</h6>
+                    <span class="badge bg-light text-primary border" style="font-size: 0.7rem;">NLP Engine</span>
+                </div>
                 <ul class="list-unstyled small mb-0">
-                    <li class="d-flex justify-content-between py-1 border-bottom">
+                    <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <span class="text-muted">Category:</span>
                         <strong class="text-dark">{{ grievance.predicted_category }}</strong>
                     </li>
-                    <li class="d-flex justify-content-between py-1 border-bottom">
-                        <span class="text-muted">Priority:</span>
+                    <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Priority Level:</span>
                         {% if grievance.predicted_priority == 'High' %}
-                            <span class="badge badge-clean badge-priority-high">High</span>
+                            <span class="badge badge-clean badge-priority-high"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
                         {% elif grievance.predicted_priority == 'Medium' %}
                             <span class="badge badge-clean badge-priority-medium">Medium</span>
                         {% else %}
                             <span class="badge badge-clean badge-priority-low">Low</span>
                         {% endif %}
                     </li>
-                    <li class="d-flex justify-content-between py-1 border-bottom">
-                        <span class="text-muted">Department:</span>
+                    <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Sentiment Analysis:</span>
+                        {% if grievance.sentiment == 'Negative' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Urgent / Negative</span>
+                        {% elif grievance.sentiment == 'Positive' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">Constructive</span>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary border">Neutral</span>
+                        {% endif %}
+                    </li>
+                    <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Responsible Dept:</span>
                         <span class="text-dark fw-semibold">{{ grievance.assigned_department.department_name if grievance.assigned_department else 'Unassigned' }}</span>
                     </li>
-                    <li class="d-flex justify-content-between py-1">
-                        <span class="text-muted">Assigned Staff:</span>
+                    <li class="d-flex justify-content-between align-items-center py-2">
+                        <span class="text-muted">Assigned Officer:</span>
                         <span class="text-dark fw-semibold">{{ grievance.assigned_staff.name if grievance.assigned_staff else 'Unassigned' }}</span>
                     </li>
                 </ul>
+
+                {% if current_user.role == 'admin' %}
+                    <div class="mt-3 pt-2 border-top text-center">
+                        <a href="{{ url_for('admin_reassign', grievance_id=grievance.grievance_id) }}" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="bi bi-arrow-left-right me-1"></i> Reassign Dept or Staff
+                        </a>
+                    </div>
+                {% endif %}
             </div>
 
-            <!-- Staff/Admin Action Form (Prompt Section 8) -->
+            <!-- Staff / Admin Action Box -->
             {% if current_user.role in ['staff', 'admin'] %}
-                <div class="card card-simple p-3 shadow-sm mb-4">
-                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Update Status</h6>
+                <div class="card card-simple p-3 shadow-sm mb-4 bg-white">
+                    <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-square text-primary me-2"></i>Action & Status Update</h6>
+                        <span class="badge bg-primary" style="font-size: 0.7rem;">Official Record</span>
+                    </div>
+
                     <form method="POST" action="{{ url_for('update_grievance_status', grievance_id=grievance.grievance_id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                         <div class="mb-3">
-                            <label for="status" class="form-label small fw-semibold text-dark">Change Status:</label>
+                            <label for="status" class="form-label small fw-semibold text-dark">Update Ticket Status <span class="text-danger">*</span></label>
                             <select class="form-select form-select-sm" id="status" name="status" required>
-                                <option value="Assigned" {% if grievance.status == 'Assigned' %}selected{% endif %}>Assigned</option>
-                                <option value="In Progress" {% if grievance.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                                <option value="Resolved" {% if grievance.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                <option value="Assigned" {% if grievance.status == 'Assigned' %}selected{% endif %}>Assigned (Under Review)</option>
+                                <option value="In Progress" {% if grievance.status == 'In Progress' %}selected{% endif %}>In Progress (Work in Action)</option>
+                                <option value="Resolved" {% if grievance.status == 'Resolved' %}selected{% endif %}>Resolved (Action Completed)</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="remarks" class="form-label small fw-semibold text-dark">Remarks / Action Taken:</label>
-                            <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="Describe the action taken..." required></textarea>
+                            <label for="remarks" class="form-label small fw-semibold text-dark">Action Taken / Remarks <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="4" placeholder="Detail the steps taken, parts replaced, or corrective measures initiated..." required></textarea>
+                            <div class="form-text small" style="font-size: 0.72rem;">This entry will appear on the student tracking timeline.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-sm btn-portal w-100">
-                            Save Status Update
+                        <button type="submit" class="btn btn-portal btn-sm w-100 py-2">
+                            <i class="bi bi-check-circle me-1"></i> Commit Status Update
                         </button>
                     </form>
                 </div>

@@ -1,54 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %}My Grievances{% endblock %}
+{% block title %}My Grievance History | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-lg-4 py-4">
+    <!-- Breadcrumb & Header -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}" class="text-primary">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Grievances</li>
+        </ol>
+    </nav>
+
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
-            <h4 class="fw-bold text-dark mb-0">My Grievances History</h4>
-            <p class="text-muted small mb-0">View all grievances submitted under your student account.</p>
+            <h4 class="fw-bold text-dark mb-0">My Grievance History</h4>
+            <p class="text-muted small mb-0">Complete historical record of grievances submitted under your student account.</p>
         </div>
-        <div>
-            <a href="{{ url_for('submit_grievance') }}" class="btn btn-portal">
-                <i class="bi bi-plus-lg me-1"></i> Submit Grievance
+        <div class="mt-2 mt-md-0">
+            <a href="{{ url_for('submit_grievance') }}" class="btn btn-portal btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Lodge New Grievance
             </a>
         </div>
     </div>
 
-    <!-- Filter Buttons -->
-    <div class="d-flex flex-wrap gap-2 mb-3">
-        <a href="{{ url_for('student_history') }}" class="btn btn-sm {% if not active_filter %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            All ({{ grievances|length }})
-        </a>
-        <a href="{{ url_for('student_history', status='Submitted') }}" class="btn btn-sm {% if active_filter == 'Submitted' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            Submitted
-        </a>
-        <a href="{{ url_for('student_history', status='Assigned') }}" class="btn btn-sm {% if active_filter == 'Assigned' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            Assigned
-        </a>
-        <a href="{{ url_for('student_history', status='In Progress') }}" class="btn btn-sm {% if active_filter == 'In Progress' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            In Progress
-        </a>
-        <a href="{{ url_for('student_history', status='Resolved') }}" class="btn btn-sm {% if active_filter == 'Resolved' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            Resolved
-        </a>
+    <!-- Filter Buttons Toolbar & Table Search -->
+    <div class="card card-simple p-3 mb-3 bg-light">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('student_history') }}" class="btn btn-sm {% if not active_filter %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    All Grievances
+                </a>
+                <a href="{{ url_for('student_history', status='Submitted') }}" class="btn btn-sm {% if active_filter == 'Submitted' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    Submitted
+                </a>
+                <a href="{{ url_for('student_history', status='Assigned') }}" class="btn btn-sm {% if active_filter == 'Assigned' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    Assigned
+                </a>
+                <a href="{{ url_for('student_history', status='In Progress') }}" class="btn btn-sm {% if active_filter == 'In Progress' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    In Progress
+                </a>
+                <a href="{{ url_for('student_history', status='Resolved') }}" class="btn btn-sm {% if active_filter == 'Resolved' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    Resolved
+                </a>
+            </div>
+            <div>
+                <input type="text" class="form-control form-control-sm" placeholder="Search in history..." data-table-filter="#historyTable" style="min-width: 240px;">
+            </div>
+        </div>
     </div>
 
-    <!-- History Table (Prompt Section 7) -->
-    <div class="card card-simple shadow-sm">
+    <!-- History Table -->
+    <div class="card card-simple shadow-sm bg-white">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-clean align-middle mb-0">
+                <table class="table table-clean align-middle mb-0" id="historyTable">
                     <thead>
                         <tr>
                             <th class="ps-3" style="width: 80px;">ID</th>
-                            <th>Title</th>
+                            <th>Complaint Subject</th>
                             <th>Category</th>
                             <th>Priority</th>
-                            <th>Assigned Dept</th>
+                            <th>Department</th>
+                            <th>Assigned Staff</th>
                             <th>Status</th>
-                            <th>Date</th>
+                            <th>Submission Date</th>
                             <th class="text-end pe-3">Action</th>
                         </tr>
                     </thead>
@@ -59,33 +75,34 @@
                                     <td class="ps-3 fw-bold text-primary">#{{ g.grievance_id }}</td>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ g.title }}</div>
-                                        <div class="text-muted small text-truncate" style="max-width: 320px;">{{ g.description }}</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 300px;">{{ g.description }}</div>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark border">{{ g.predicted_category or 'General' }}</span>
                                     </td>
                                     <td>
                                         {% if g.predicted_priority == 'High' %}
-                                            <span class="badge badge-clean badge-priority-high">High</span>
+                                            <span class="badge badge-clean badge-priority-high"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
                                         {% elif g.predicted_priority == 'Medium' %}
                                             <span class="badge badge-clean badge-priority-medium">Medium</span>
                                         {% else %}
                                             <span class="badge badge-clean badge-priority-low">Low</span>
                                         {% endif %}
                                     </td>
-                                    <td class="small">{{ g.assigned_department.department_name if g.assigned_department else 'Pending' }}</td>
+                                    <td class="small">{{ g.assigned_department.department_name if g.assigned_department else 'Pending Routing' }}</td>
+                                    <td class="small text-muted">{{ g.assigned_staff.name if g.assigned_staff else 'Awaiting' }}</td>
                                     <td>
                                         {% if g.status == 'Resolved' %}
-                                            <span class="badge badge-clean badge-resolved">Resolved</span>
+                                            <span class="badge badge-clean badge-resolved"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
                                         {% elif g.status == 'In Progress' %}
-                                            <span class="badge badge-clean badge-progress">In Progress</span>
+                                            <span class="badge badge-clean badge-progress"><i class="bi bi-gear-fill me-1"></i>In Progress</span>
                                         {% elif g.status == 'Assigned' %}
-                                            <span class="badge badge-clean badge-assigned">Assigned</span>
+                                            <span class="badge badge-clean badge-assigned"><i class="bi bi-person-check-fill me-1"></i>Assigned</span>
                                         {% else %}
-                                            <span class="badge badge-clean badge-submitted">Submitted</span>
+                                            <span class="badge badge-clean badge-submitted"><i class="bi bi-clock me-1"></i>Submitted</span>
                                         {% endif %}
                                     </td>
-                                    <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y %H:%M') if g.created_at else '' }}</td>
+                                    <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y, %I:%M %p') if g.created_at else '' }}</td>
                                     <td class="text-end pe-3">
                                         <a href="{{ url_for('grievance_details', grievance_id=g.grievance_id) }}" class="btn btn-sm btn-portal-outline py-1 px-3">
                                             Track Status
@@ -95,8 +112,9 @@
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    No records found for this filter.
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder2-open fs-2 d-block mb-2 text-secondary"></i>
+                                    No grievance records match the selected filter.
                                 </td>
                             </tr>
                         {% endif %}

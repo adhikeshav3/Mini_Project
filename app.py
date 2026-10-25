@@ -8,8 +8,10 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
+import secrets
+from markupsafe import Markup
 from flask import (
-    Flask, render_template, request, redirect, url_for, flash, jsonify, abort
+    Flask, render_template, request, redirect, url_for, flash, jsonify, abort, session
 )
 from flask_login import (
     LoginManager, login_user, logout_user, login_required, current_user
@@ -45,6 +47,33 @@ def load_user(user_id):
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
+
+# CSRF Protection Implementation
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = secrets.token_hex(32)
+    return session['_csrf_token']
+
+@app.context_processor
+def inject_csrf():
+    token = generate_csrf_token()
+    return {
+        'csrf_token_value': token,
+        'csrf_token': lambda: Markup(f'<input type="hidden" name="csrf_token" value="{token}">')
+    }
+
+@app.before_request
+def csrf_protect():
+    if app.config.get('TESTING') or not app.config.get('WTF_CSRF_ENABLED', True):
+        return
+    if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        # Allow internal preview endpoint
+        if request.path.startswith('/api/predict-preview') or (request.is_json and current_user.is_authenticated):
+            return
+        token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken')
+        expected = session.get('_csrf_token')
+        if not expected or not token or not secrets.compare_digest(token, expected):
+            abort(400, description="Security Notice: Invalid or expired CSRF submission token. Please reload the page and try again.")
 
 # Role-Based Access Control Decorator
 def role_required(*allowed_roles):
@@ -167,18 +196,34 @@ def logout():
 # STUDENT PORTAL ROUTES
 # -------------------------------------------------------------------
 
-@app.route('/student/dashboard')
+@app.route('/student/dashboard', methods=['GET', 'POST'])
 @role_required('student')
 def student_dashboard():
     student_id = current_user.user_id
-    grievances = db_session.query(Grievance).filter_by(student_id=student_id).order_by(Grievance.created_at.desc()).all()
+    status_filter = request.args.get('status', '').strip()
+    search_query = request.args.get('q', '').strip()
 
-    total_submitted = len(grievances)
-    pending_count = sum(1 for g in grievances if g.status in ['Submitted', 'Assigned'])
-    in_progress_count = sum(1 for g in grievances if g.status == 'In Progress')
-    resolved_count = sum(1 for g in grievances if g.status == 'Resolved')
+    # Query for filtered display
+    query = db_session.query(Grievance).filter_by(student_id=student_id)
+    if status_filter:
+        query = query.filter(Grievance.status == status_filter)
+    if search_query:
+        query = query.filter(
+            or_(
+                Grievance.title.ilike(f'%{search_query}%'),
+                Grievance.description.ilike(f'%{search_query}%'),
+                Grievance.predicted_category.ilike(f'%{search_query}%')
+            )
+        )
 
-    recent_grievances = grievances[:5]
+    # Compute overall statistics for the student across all records
+    all_grievances = db_session.query(Grievance).filter_by(student_id=student_id).all()
+    total_submitted = len(all_grievances)
+    pending_count = sum(1 for g in all_grievances if g.status in ['Submitted', 'Assigned'])
+    in_progress_count = sum(1 for g in all_grievances if g.status == 'In Progress')
+    resolved_count = sum(1 for g in all_grievances if g.status == 'Resolved')
+
+    recent_grievances = query.order_by(Grievance.created_at.desc()).limit(15).all()
 
     return render_template(
         'student_dashboard.html',
@@ -186,7 +231,9 @@ def student_dashboard():
         pending_count=pending_count,
         in_progress_count=in_progress_count,
         resolved_count=resolved_count,
-        recent_grievances=recent_grievances
+        recent_grievances=recent_grievances,
+        active_filter=status_filter,
+        search_query=search_query
     )
 
 @app.route('/student/submit', methods=['GET', 'POST'])
@@ -223,14 +270,28 @@ def submit_grievance():
 @app.route('/student/history')
 @role_required('student')
 def student_history():
-    status_filter = request.args.get('status')
+    status_filter = request.args.get('status', '').strip()
+    search_query = request.args.get('q', '').strip()
     query = db_session.query(Grievance).filter_by(student_id=current_user.user_id)
 
     if status_filter:
-        query = query.filter_by(status=status_filter)
+        query = query.filter(Grievance.status == status_filter)
+    if search_query:
+        query = query.filter(
+            or_(
+                Grievance.title.ilike(f'%{search_query}%'),
+                Grievance.description.ilike(f'%{search_query}%'),
+                Grievance.predicted_category.ilike(f'%{search_query}%')
+            )
+        )
 
     grievances = query.order_by(Grievance.created_at.desc()).all()
-    return render_template('student_history.html', grievances=grievances, active_filter=status_filter)
+    return render_template(
+        'student_history.html',
+        grievances=grievances,
+        active_filter=status_filter,
+        search_query=search_query
+    )
 
 @app.route('/student/feedback/<int:grievance_id>', methods=['POST'])
 @role_required('student')
@@ -266,34 +327,58 @@ def staff_dashboard():
     dept_id = current_user.department_id
     if not dept_id:
         flash("Your staff account is not assigned to a department. Please contact Administrator.", "warning")
-        return render_template('staff_dashboard.html', grievances=[], total_count=0, pending_count=0, in_progress_count=0, resolved_count=0)
+        return render_template(
+            'staff_dashboard.html',
+            grievances=[],
+            total_count=0,
+            pending_count=0,
+            in_progress_count=0,
+            resolved_count=0,
+            high_priority_count=0,
+            urgent_grievances=[],
+            active_filter='',
+            active_priority='',
+            search_query='',
+            department=None
+        )
+
+    status_filter = request.args.get('status', '').strip()
+    priority_filter = request.args.get('priority', '').strip()
+    search_query = request.args.get('q', '').strip()
 
     # Department grievances
-    query = db_session.query(Grievance).filter(
-        or_(
-            Grievance.assigned_department_id == dept_id,
-            Grievance.assigned_staff_id == current_user.user_id
-        )
+    base_filter = or_(
+        Grievance.assigned_department_id == dept_id,
+        Grievance.assigned_staff_id == current_user.user_id
     )
+    query = db_session.query(Grievance).filter(base_filter)
 
-    status_filter = request.args.get('status')
     if status_filter:
         query = query.filter(Grievance.status == status_filter)
+    if priority_filter:
+        query = query.filter(Grievance.predicted_priority == priority_filter)
+    if search_query:
+        query = query.join(User, Grievance.student_id == User.user_id, isouter=True).filter(
+            or_(
+                Grievance.title.ilike(f'%{search_query}%'),
+                Grievance.description.ilike(f'%{search_query}%'),
+                User.name.ilike(f'%{search_query}%'),
+                User.email.ilike(f'%{search_query}%')
+            )
+        )
 
     dept_grievances = query.order_by(Grievance.created_at.desc()).all()
 
-    # Compute metrics for staff department
-    all_dept_grievances = db_session.query(Grievance).filter(
-        or_(
-            Grievance.assigned_department_id == dept_id,
-            Grievance.assigned_staff_id == current_user.user_id
-        )
-    ).all()
+    # Compute metrics for staff department across all its cases
+    all_dept_grievances = db_session.query(Grievance).filter(base_filter).all()
 
     total_count = len(all_dept_grievances)
     pending_count = sum(1 for g in all_dept_grievances if g.status in ['Submitted', 'Assigned'])
     in_progress_count = sum(1 for g in all_dept_grievances if g.status == 'In Progress')
     resolved_count = sum(1 for g in all_dept_grievances if g.status == 'Resolved')
+    high_priority_count = sum(1 for g in all_dept_grievances if g.predicted_priority == 'High' and g.status != 'Resolved')
+
+    urgent_grievances = [g for g in all_dept_grievances if g.predicted_priority == 'High' and g.status != 'Resolved']
 
     return render_template(
         'staff_dashboard.html',
@@ -302,11 +387,16 @@ def staff_dashboard():
         pending_count=pending_count,
         in_progress_count=in_progress_count,
         resolved_count=resolved_count,
+        high_priority_count=high_priority_count,
+        urgent_grievances=urgent_grievances,
         active_filter=status_filter,
+        active_priority=priority_filter,
+        search_query=search_query,
         department=current_user.department
     )
 
 @app.route('/staff/update-status/<int:grievance_id>', methods=['POST'])
+@app.route('/grievance/<int:grievance_id>/status', methods=['POST'])
 @role_required('staff', 'admin')
 def update_grievance_status(grievance_id):
     new_status = request.form.get('status', '').strip()
@@ -405,6 +495,12 @@ def admin_dashboard():
     # Flagged Duplicates
     flagged_duplicates = db_session.query(DuplicateMatches).filter_by(review_status='Flagged').all()
 
+    # Unassigned Grievance Alert (Grievances awaiting staff assignment)
+    unassigned_grievances = db_session.query(Grievance).filter(
+        Grievance.assigned_staff_id == None,
+        Grievance.status.in_(['Submitted', 'Assigned', 'In Progress'])
+    ).order_by(Grievance.created_at.desc()).all()
+
     # Admin Notifications
     notifications = NotificationService.get_admin_notifications(db_session)
 
@@ -428,6 +524,7 @@ def admin_dashboard():
         departments=departments,
         staff_workload=staff_workload,
         flagged_duplicates=flagged_duplicates,
+        unassigned_grievances=unassigned_grievances,
         notifications=notifications,
         model_metrics=model_metrics,
         selected_dept=dept_filter,
@@ -492,9 +589,12 @@ def review_duplicate(match_id):
 # -------------------------------------------------------------------
 
 @app.route('/grievances/<int:grievance_id>')
+@app.route('/grievance/<int:grievance_id>')
 @login_required
 def grievance_details(grievance_id):
-    grievance = db_session.query(Grievance).filter_by(grievance_id=grievance_id).first_or_404()
+    grievance = db_session.query(Grievance).filter_by(grievance_id=grievance_id).first()
+    if not grievance:
+        abort(404)
 
     # Authorization check:
     # Allowed if user is the student who filed it, staff assigned to it or in that dept, or admin
@@ -595,6 +695,11 @@ def api_predict_preview():
 # ERROR HANDLERS
 # -------------------------------------------------------------------
 
+@app.errorhandler(400)
+def bad_request_error(error):
+    desc = getattr(error, 'description', "400 Bad Request: The request could not be processed due to invalid parameters.")
+    return render_template('base.html', custom_error=str(desc)), 400
+
 @app.errorhandler(403)
 def forbidden_error(error):
     return render_template('base.html', custom_error="403 Forbidden: You do not have permission to access this resource."), 403
@@ -621,5 +726,6 @@ if __name__ == '__main__':
     print("\n" + "="*60)
     print("  STUDENT GRIEVANCE RESOLUTION PORTAL IS RUNNING")
     print("  Local URL: http://127.0.0.1:5000")
+    print(f"  Debug Mode: {Config.DEBUG}")
     print("="*60 + "\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=Config.DEBUG, port=5000)

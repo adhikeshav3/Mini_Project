@@ -1,42 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}Submit Grievance{% endblock %}
+{% block title %}Submit Grievance | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 680px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold text-dark mb-0">Submit Grievance</h4>
+<div class="container py-4" style="max-width: 720px;">
+    <!-- Breadcrumb & Header -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}" class="text-primary">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Submit Grievance</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            <h4 class="fw-bold text-dark mb-0">Lodge Official Grievance</h4>
+            <p class="text-muted small mb-0">Submit your complaint for NLP categorization and departmental redressal.</p>
+        </div>
         <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
     </div>
 
-    <div class="card card-simple p-4 shadow-sm">
+    <!-- Instructions / Policy Notice -->
+    <div class="alert alert-light border small text-muted mb-4">
+        <div class="d-flex align-items-start gap-2">
+            <i class="bi bi-info-circle-fill text-primary mt-1"></i>
+            <div>
+                <strong class="text-dark">Guidelines for Prompt Resolution:</strong>
+                <ul class="mb-0 ps-3 mt-1">
+                    <li>Provide specific location details (Campus block, floor, laboratory/classroom number).</li>
+                    <li>Avoid ambiguous wording; clearly state the failure, delay, or issue observed.</li>
+                    <li>For physical hazards (e.g., exposed wiring, gas leaks), also notify building security immediately.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-simple p-4 shadow-sm bg-white">
         <form method="POST" action="{{ url_for('submit_grievance') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <!-- Title -->
             <div class="mb-3">
-                <label for="title" class="form-label fw-semibold text-dark small">Grievance Title <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Water cooler leaking on 2nd floor" required autofocus>
+                <label for="title" class="form-label fw-semibold text-dark small">
+                    Grievance Subject / Title <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Damaged electrical switchboard in Classroom 204" required autofocus maxlength="200">
+                <div class="form-text small" style="font-size: 0.75rem;">A brief summary of the issue (max 200 characters).</div>
             </div>
 
             <!-- Description -->
             <div class="mb-3">
-                <label for="description" class="form-label fw-semibold text-dark small">Description <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Briefly describe what the problem is and where it is located..." required></textarea>
+                <label for="description" class="form-label fw-semibold text-dark small">
+                    Detailed Complaint Description & Exact Location <span class="text-danger">*</span>
+                </label>
+                <textarea class="form-control" id="description" name="description" rows="5" placeholder="Describe the problem, impact on students, and specific location..." required></textarea>
+                <div class="form-text small" style="font-size: 0.75rem;">The NLP engine analyzes this description to determine category, priority, and department assignment.</div>
             </div>
 
             <!-- File Upload -->
             <div class="mb-4">
                 <label for="attachment" class="form-label fw-semibold text-dark small">
-                    Supporting Photo or Document <span class="text-muted fw-normal">(Optional)</span>
+                    Supporting Photo or Document <span class="text-muted fw-normal">(Optional, JPG, PNG, PDF &le; 10MB)</span>
                 </label>
                 <input class="form-control form-control-sm" type="file" id="attachment" name="attachment" accept=".png,.jpg,.jpeg,.pdf">
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+                <a href="{{ url_for('student_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </a>
                 <button type="submit" class="btn btn-portal px-4 py-2">
-                    <i class="bi bi-send me-1"></i> Submit Grievance
+                    <i class="bi bi-send me-1"></i> Submit Official Grievance
                 </button>
             </div>
         </form>

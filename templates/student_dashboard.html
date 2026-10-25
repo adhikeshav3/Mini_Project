@@ -1,32 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Student Dashboard{% endblock %}
+{% block title %}Student Dashboard | Apex Grievance Portal{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-lg-4 py-4">
-    <!-- Header -->
+    <!-- Student Header & Profile Banner -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
-            <h4 class="fw-bold text-dark mb-0">Student Dashboard</h4>
-            <p class="text-muted small mb-0">Welcome, {{ current_user.name }}. Track your submitted grievances.</p>
+            <div class="d-flex align-items-center gap-2">
+                <h4 class="fw-bold text-dark mb-0">Student Grievance Dashboard</h4>
+                <span class="badge bg-primary" style="font-size: 0.75rem;">Student Portal</span>
+            </div>
+            <p class="text-muted small mb-0">Logged in as <strong>{{ current_user.name }}</strong> ({{ current_user.email }}) &bull; Monitor ticket status in real time</p>
         </div>
-        <div class="mt-2 mt-md-0">
-            <a href="{{ url_for('submit_grievance') }}" class="btn btn-portal">
-                <i class="bi bi-plus-lg me-1"></i> Submit Grievance
+        <div class="mt-2 mt-md-0 d-flex gap-2">
+            <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-clock-history me-1"></i> View Full History
+            </a>
+            <a href="{{ url_for('submit_grievance') }}" class="btn btn-sm btn-portal">
+                <i class="bi bi-plus-circle me-1"></i> Submit Grievance
             </a>
         </div>
     </div>
 
-    <!-- 4 Stats Cards (Prompt Section 7) -->
+    <!-- 4 Key Performance Indicators (KPI Cards) -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="stat-box">
                 <div>
                     <div class="stat-number">{{ total_submitted }}</div>
-                    <div class="stat-text">Total Submitted</div>
+                    <div class="stat-text">Total Lodged</div>
                 </div>
                 <div class="stat-icon-wrap">
-                    <i class="bi bi-folder"></i>
+                    <i class="bi bi-journal-text"></i>
                 </div>
             </div>
         </div>
@@ -34,7 +40,7 @@
             <div class="stat-box">
                 <div>
                     <div class="stat-number text-dark">{{ pending_count }}</div>
-                    <div class="stat-text">Pending</div>
+                    <div class="stat-text">Pending Triage</div>
                 </div>
                 <div class="stat-icon-wrap pending">
                     <i class="bi bi-hourglass-split"></i>
@@ -44,11 +50,11 @@
         <div class="col-6 col-md-3">
             <div class="stat-box">
                 <div>
-                    <div class="stat-number text-dark">{{ in_progress_count }}</div>
+                    <div class="stat-number text-primary">{{ in_progress_count }}</div>
                     <div class="stat-text">In Progress</div>
                 </div>
                 <div class="stat-icon-wrap progress">
-                    <i class="bi bi-gear"></i>
+                    <i class="bi bi-gear-fill"></i>
                 </div>
             </div>
         </div>
@@ -65,55 +71,71 @@
         </div>
     </div>
 
-    <!-- Quick Submit Form Directly on Dashboard -->
-    <div class="card card-simple p-4 shadow-sm mb-4">
-        <h6 class="fw-bold text-dark mb-3">
-            <i class="bi bi-pencil-square text-primary me-2"></i>Submit a New Grievance
-        </h6>
+    <!-- Quick In-Dashboard Submission Form -->
+    <div class="card card-simple p-4 shadow-sm mb-4 bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold text-dark mb-0">
+                <i class="bi bi-pencil-square text-primary me-2"></i>Quick Grievance Submission
+            </h6>
+            <span class="badge bg-light text-muted border small fw-normal">Automated NLP Triage</span>
+        </div>
+
         <form method="POST" action="{{ url_for('submit_grievance') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="row g-3">
                 <div class="col-md-5">
-                    <label class="form-label small fw-semibold text-dark">Complaint Title <span class="text-danger">*</span></label>
-                    <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. Projector not working in Room 204" required>
+                    <label class="form-label small fw-semibold text-dark">Subject / Title <span class="text-danger">*</span></label>
+                    <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. Damaged electrical switchboard in Classroom 204" required>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label small fw-semibold text-dark">Description <span class="text-danger">*</span></label>
-                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Describe the problem and location clearly..." required>
+                    <label class="form-label small fw-semibold text-dark">Incident Description & Location <span class="text-danger">*</span></label>
+                    <input type="text" name="description" class="form-control form-control-sm" placeholder="Provide exact details: building, floor, room number, equipment..." required>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-portal btn-sm w-100 py-2">
-                        <i class="bi bi-send me-1"></i> Submit
+                        <i class="bi bi-send me-1"></i> Submit Ticket
                     </button>
                 </div>
             </div>
-            <div class="mt-2 d-flex align-items-center gap-2">
-                <label for="dash-file" class="btn btn-light btn-sm border py-0 px-2 text-muted" style="font-size: 0.78rem; cursor: pointer;">
-                    <i class="bi bi-paperclip me-1"></i> Attach Photo/Document (Optional)
-                </label>
-                <input type="file" id="dash-file" name="attachment" class="d-none" onchange="document.getElementById('dash-file-name').textContent = this.files[0] ? this.files[0].name : ''">
-                <span id="dash-file-name" class="small text-muted" style="font-size: 0.75rem;"></span>
+
+            <div class="mt-3 pt-2 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <label for="dash-file" class="btn btn-light btn-sm border py-1 px-2 text-dark small" style="cursor: pointer;">
+                        <i class="bi bi-paperclip me-1 text-primary"></i> Attach Proof (JPG, PNG, PDF &le; 10MB)
+                    </label>
+                    <input type="file" id="dash-file" name="attachment" class="d-none" accept=".png,.jpg,.jpeg,.pdf" onchange="document.getElementById('dash-file-name').textContent = this.files[0] ? this.files[0].name : ''">
+                    <span id="dash-file-name" class="small text-muted fw-semibold"></span>
+                </div>
+                <div class="text-muted small" style="font-size: 0.75rem;">
+                    <i class="bi bi-shield-exclamation text-warning me-1"></i> Emergency safety issues (e.g. fire/sparks) are auto-escalated to High Priority.
+                </div>
             </div>
         </form>
     </div>
 
-    <!-- Recent Grievances Card -->
-    <div class="card card-simple shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-dark"><i class="bi bi-list-task me-2 text-primary"></i>Recent Grievances</span>
-            <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+    <!-- Recent Grievances Card with Search and Status Filter -->
+    <div class="card card-simple shadow-sm bg-white">
+        <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span class="fw-bold text-dark"><i class="bi bi-list-check me-2 text-primary"></i>Recent Grievances</span>
+            <div class="d-flex gap-2">
+                <input type="text" class="form-control form-control-sm" placeholder="Search my grievances..." data-table-filter="#studentGrievancesTable" style="max-width: 220px;">
+                <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-clean align-middle mb-0">
+                <table class="table table-clean align-middle mb-0" id="studentGrievancesTable">
                     <thead>
                         <tr>
-                            <th class="ps-3" style="width: 80px;">ID</th>
-                            <th>Title</th>
+                            <th class="ps-3" style="width: 85px;">ID</th>
+                            <th>Complaint Title</th>
                             <th>Category</th>
                             <th>Priority</th>
-                            <th>Assigned Dept</th>
+                            <th>Department</th>
+                            <th>Assigned Staff</th>
                             <th>Status</th>
-                            <th>Date</th>
+                            <th>Submitted</th>
                             <th class="text-end pe-3">Action</th>
                         </tr>
                     </thead>
@@ -124,30 +146,31 @@
                                     <td class="ps-3 fw-bold text-primary">#{{ g.grievance_id }}</td>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ g.title }}</div>
-                                        <div class="text-muted small text-truncate" style="max-width: 320px;">{{ g.description }}</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 280px;">{{ g.description }}</div>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark border">{{ g.predicted_category or 'General' }}</span>
                                     </td>
                                     <td>
                                         {% if g.predicted_priority == 'High' %}
-                                            <span class="badge badge-clean badge-priority-high">High</span>
+                                            <span class="badge badge-clean badge-priority-high"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
                                         {% elif g.predicted_priority == 'Medium' %}
                                             <span class="badge badge-clean badge-priority-medium">Medium</span>
                                         {% else %}
                                             <span class="badge badge-clean badge-priority-low">Low</span>
                                         {% endif %}
                                     </td>
-                                    <td class="small">{{ g.assigned_department.department_name if g.assigned_department else 'Pending' }}</td>
+                                    <td class="small">{{ g.assigned_department.department_name if g.assigned_department else 'Pending Routing' }}</td>
+                                    <td class="small text-muted">{{ g.assigned_staff.name if g.assigned_staff else 'Awaiting' }}</td>
                                     <td>
                                         {% if g.status == 'Resolved' %}
-                                            <span class="badge badge-clean badge-resolved">Resolved</span>
+                                            <span class="badge badge-clean badge-resolved"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
                                         {% elif g.status == 'In Progress' %}
-                                            <span class="badge badge-clean badge-progress">In Progress</span>
+                                            <span class="badge badge-clean badge-progress"><i class="bi bi-gear-fill me-1"></i>In Progress</span>
                                         {% elif g.status == 'Assigned' %}
-                                            <span class="badge badge-clean badge-assigned">Assigned</span>
+                                            <span class="badge badge-clean badge-assigned"><i class="bi bi-person-check-fill me-1"></i>Assigned</span>
                                         {% else %}
-                                            <span class="badge badge-clean badge-submitted">Submitted</span>
+                                            <span class="badge badge-clean badge-submitted"><i class="bi bi-clock me-1"></i>Submitted</span>
                                         {% endif %}
                                     </td>
                                     <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y') if g.created_at else '' }}</td>
@@ -160,8 +183,9 @@
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    No grievances submitted yet. Click "Submit Grievance" above to create one.
+                                <td colspan="9" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+                                    You have not submitted any grievances yet. Use the form above or click "Submit Grievance".
                                 </td>
                             </tr>
                         {% endif %}

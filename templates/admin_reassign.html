@@ -1,47 +1,69 @@
 {% extends "base.html" %}
 
-{% block title %}Reassign Grievance #{{ grievance.grievance_id }}{% endblock %}
+{% block title %}Reassign Grievance #{{ grievance.grievance_id }} | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 760px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold text-dark mb-0">Reassign Grievance #{{ grievance.grievance_id }}</h4>
+<div class="container py-4" style="max-width: 780px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}" class="text-primary">Admin Console</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reassign Ticket #{{ grievance.grievance_id }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <div>
+            <h4 class="fw-bold text-dark mb-0">Reassign Grievance #{{ grievance.grievance_id }}</h4>
+            <p class="text-muted small mb-0">Override automatic departmental routing or allocate ticket to another officer.</p>
+        </div>
         <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Back to Admin
+            <i class="bi bi-arrow-left me-1"></i> Back to Console
         </a>
     </div>
 
-    <div class="card card-simple p-4 shadow-sm">
-        <!-- Complaint Summary -->
+    <div class="card card-simple p-4 shadow-sm bg-white">
+        <!-- Original Grievance Dossier -->
         <div class="p-3 bg-light rounded border mb-4">
-            <h6 class="fw-bold text-dark mb-1">{{ grievance.title }}</h6>
-            <p class="text-muted small mb-2">{{ grievance.description }}</p>
-            <div class="d-flex flex-wrap gap-3 small text-muted pt-2 border-top">
-                <div><strong>Student:</strong> {{ grievance.student.name }}</div>
-                <div><strong>Current Category:</strong> <span class="badge bg-secondary">{{ grievance.predicted_category }}</span></div>
-                <div><strong>Current Dept:</strong> {{ grievance.assigned_department.department_name if grievance.assigned_department else 'None' }}</div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="fw-bold text-dark mb-0">{{ grievance.title }}</h6>
+                <span class="badge bg-secondary">Ticket #{{ grievance.grievance_id }}</span>
+            </div>
+            <p class="text-muted small mb-3" style="white-space: pre-wrap;">{{ grievance.description }}</p>
+            <div class="row g-2 small text-muted pt-2 border-top">
+                <div class="col-md-4">
+                    <strong>Student:</strong> {{ grievance.student.name if grievance.student else 'Unknown' }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Current Category:</strong> <span class="badge bg-light text-dark border">{{ grievance.predicted_category }}</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Current Dept:</strong> {{ grievance.assigned_department.department_name if grievance.assigned_department else 'Unassigned' }}
+                </div>
             </div>
         </div>
 
         <!-- Reassignment Form -->
         <form method="POST" action="{{ url_for('admin_reassign', grievance_id=grievance.grievance_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="category" class="form-label fw-semibold text-dark small">Grievance Category</label>
+                    <label for="category" class="form-label fw-semibold text-dark small">Administrative Category <span class="text-danger">*</span></label>
                     <select class="form-select form-select-sm" id="category" name="category" required>
                         <option value="Academic" {% if grievance.predicted_category == 'Academic' %}selected{% endif %}>Academic</option>
                         <option value="Examination" {% if grievance.predicted_category == 'Examination' %}selected{% endif %}>Examination</option>
-                        <option value="Hostel" {% if grievance.predicted_category == 'Hostel' %}selected{% endif %}>Hostel</option>
+                        <option value="Hostel" {% if grievance.predicted_category == 'Hostel' %}selected{% endif %}>Hostel & Mess</option>
                         <option value="Transport" {% if grievance.predicted_category == 'Transport' %}selected{% endif %}>Transport</option>
-                        <option value="Infrastructure" {% if grievance.predicted_category == 'Infrastructure' %}selected{% endif %}>Infrastructure</option>
+                        <option value="Infrastructure" {% if grievance.predicted_category == 'Infrastructure' %}selected{% endif %}>Infrastructure & Maintenance</option>
                         <option value="Library" {% if grievance.predicted_category == 'Library' %}selected{% endif %}>Library</option>
-                        <option value="Administration" {% if grievance.predicted_category == 'Administration' %}selected{% endif %}>Administration</option>
+                        <option value="Administration" {% if grievance.predicted_category == 'Administration' %}selected{% endif %}>Administration & Accounts</option>
                         <option value="Other" {% if grievance.predicted_category == 'Other' %}selected{% endif %}>Other</option>
                     </select>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="department_id" class="form-label fw-semibold text-dark small">Assign Department</label>
+                    <label for="department_id" class="form-label fw-semibold text-dark small">Assign Department Unit <span class="text-danger">*</span></label>
                     <select class="form-select form-select-sm" id="department_id" name="department_id" required>
                         {% for d in departments %}
                             <option value="{{ d.department_id }}" {% if grievance.assigned_department_id == d.department_id %}selected{% endif %}>
@@ -53,25 +75,30 @@
             </div>
 
             <div class="mb-3">
-                <label for="staff_id" class="form-label fw-semibold text-dark small">Assign Staff Member</label>
+                <label for="staff_id" class="form-label fw-semibold text-dark small">Designate Staff Officer <span class="text-danger">*</span></label>
                 <select class="form-select form-select-sm" id="staff_id" name="staff_id" required>
-                    <option value="">-- Select Staff Member --</option>
+                    <option value="">-- Select Designated Staff Member --</option>
                     {% for s in staff_members %}
                         <option value="{{ s.user_id }}" {% if grievance.assigned_staff_id == s.user_id %}selected{% endif %}>
-                            {{ s.name }} ({{ s.department.department_name if s.department else 'General' }})
+                            {{ s.name }} ({{ s.department.department_name if s.department else 'General Administration' }})
                         </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="mb-4">
-                <label for="remarks" class="form-label fw-semibold text-dark small">Reason for Reassignment</label>
-                <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="State reason for manual reassignment..." required></textarea>
+                <label for="remarks" class="form-label fw-semibold text-dark small">Reason for Reassignment <span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="State official administrative rationale for overriding or reallocating this ticket..." required></textarea>
+                <div class="form-text small" style="font-size: 0.75rem;">This remark will be permanently logged in the audit trail.</div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-sm btn-portal px-4">Save Changes</button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-portal btn-sm px-4">
+                    <i class="bi bi-check2-circle me-1"></i> Confirm & Reassign Ticket
+                </button>
             </div>
         </form>
     </div>

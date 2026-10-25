@@ -40,7 +40,9 @@ class GrievanceService:
 
             # 4. Handle Attachment if provided
             attachment_filename = None
-            if file_obj and file_obj.filename and allowed_file(file_obj.filename):
+            if file_obj and file_obj.filename:
+                if not allowed_file(file_obj.filename):
+                    raise ValueError("Unsupported attachment file format. Only PNG, JPG, JPEG, and PDF documents are permitted.")
                 os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
                 safe_name = secure_filename(file_obj.filename)
                 timestamp_str = datetime.utcnow().strftime('%Y%m%d_%H%M%S')

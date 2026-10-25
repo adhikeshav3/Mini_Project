@@ -1,20 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}Staff Dashboard{% endblock %}
+{% block title %}Staff Work Queue | Apex Grievance Redressal Portal{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-lg-4 py-4">
+    <!-- Header with Department Badge -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
             <div class="d-flex align-items-center gap-2">
                 <h4 class="fw-bold text-dark mb-0">Staff Dashboard</h4>
-                <span class="badge bg-primary">{{ department.department_name if department else 'General Staff' }}</span>
+                <span class="badge bg-primary" style="font-size: 0.8rem;">
+                    {{ department.department_name if department else 'Campus Administration' }}
+                </span>
             </div>
-            <p class="text-muted small mb-0">Logged in as: <strong>{{ current_user.name }}</strong> &bull; Manage complaints assigned to your department</p>
+            <p class="text-muted small mb-0">Officer: <strong>{{ current_user.name }}</strong> ({{ current_user.email }}) &bull; Departmental Redressal & Resolution</p>
+        </div>
+        <div class="mt-2 mt-md-0 d-flex gap-2">
+            <span class="badge bg-light text-dark border px-3 py-2 small d-flex align-items-center gap-2">
+                <i class="bi bi-clock-history text-primary"></i> SLA Target: 24h (Urgent) / 48h (Normal)
+            </span>
         </div>
     </div>
 
-    <!-- Overview Stats (Prompt Section 8) -->
+    <!-- 4 Overview Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="stat-box">
@@ -23,7 +31,7 @@
                     <div class="stat-text">Total Assigned</div>
                 </div>
                 <div class="stat-icon-wrap">
-                    <i class="bi bi-briefcase"></i>
+                    <i class="bi bi-briefcase-fill"></i>
                 </div>
             </div>
         </div>
@@ -31,7 +39,7 @@
             <div class="stat-box">
                 <div>
                     <div class="stat-number text-dark">{{ pending_count }}</div>
-                    <div class="stat-text">Pending</div>
+                    <div class="stat-text">Pending Action</div>
                 </div>
                 <div class="stat-icon-wrap pending">
                     <i class="bi bi-hourglass-split"></i>
@@ -41,11 +49,11 @@
         <div class="col-6 col-md-3">
             <div class="stat-box">
                 <div>
-                    <div class="stat-number text-dark">{{ in_progress_count }}</div>
-                    <div class="stat-text">In Progress</div>
+                    <div class="stat-number text-primary">{{ in_progress_count }}</div>
+                    <div class="stat-text">Under Investigation</div>
                 </div>
                 <div class="stat-icon-wrap progress">
-                    <i class="bi bi-gear"></i>
+                    <i class="bi bi-tools"></i>
                 </div>
             </div>
         </div>
@@ -53,7 +61,7 @@
             <div class="stat-box">
                 <div>
                     <div class="stat-number text-success">{{ resolved_count }}</div>
-                    <div class="stat-text">Resolved</div>
+                    <div class="stat-text">Resolved Cases</div>
                 </div>
                 <div class="stat-icon-wrap resolved">
                     <i class="bi bi-check2-circle"></i>
@@ -62,53 +70,82 @@
         </div>
     </div>
 
-    <!-- Simple Filter Tabs -->
-    <div class="d-flex flex-wrap gap-2 mb-3">
-        <a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm {% if not active_filter %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            All ({{ total_count }})
-        </a>
-        <a href="{{ url_for('staff_dashboard', status='Assigned') }}" class="btn btn-sm {% if active_filter == 'Assigned' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            Assigned (New)
-        </a>
-        <a href="{{ url_for('staff_dashboard', status='In Progress') }}" class="btn btn-sm {% if active_filter == 'In Progress' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            In Progress
-        </a>
-        <a href="{{ url_for('staff_dashboard', status='Resolved') }}" class="btn btn-sm {% if active_filter == 'Resolved' %}btn-primary{% else %}btn-outline-secondary bg-white{% endif %}">
-            Resolved
-        </a>
+    <!-- Check for any High Priority uncompleted complaints -->
+    {% set urgent_cases = [] %}
+    {% for g in grievances %}
+        {% if g.predicted_priority == 'High' and g.status != 'Resolved' %}
+            {% set _ = urgent_cases.append(g) %}
+        {% endif %}
+    {% endfor %}
+
+    {% if urgent_cases %}
+    <div class="alert alert-danger d-flex align-items-center justify-content-between p-3 mb-4 shadow-sm border-danger">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-exclamation-octagon-fill fs-4 text-danger"></i>
+            <div>
+                <strong class="text-danger">High-Priority Alert:</strong>
+                <span class="small text-dark ms-1">You have {{ urgent_cases|length }} urgent ticket(s) requiring immediate on-site inspection or remedial action.</span>
+            </div>
+        </div>
+        <a href="#assignedTable" class="btn btn-sm btn-danger px-3">Review Urgent Tickets</a>
+    </div>
+    {% endif %}
+
+    <!-- Filter Buttons & Search Toolbar -->
+    <div class="card card-simple p-3 mb-3 bg-light">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('staff_dashboard') }}" class="btn btn-sm {% if not active_filter %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    All Assigned ({{ total_count }})
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='Assigned') }}" class="btn btn-sm {% if active_filter == 'Assigned' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    New / Assigned ({{ pending_count }})
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='In Progress') }}" class="btn btn-sm {% if active_filter == 'In Progress' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    In Progress ({{ in_progress_count }})
+                </a>
+                <a href="{{ url_for('staff_dashboard', status='Resolved') }}" class="btn btn-sm {% if active_filter == 'Resolved' %}btn-primary{% else %}btn-outline-secondary bg-white text-dark{% endif %}">
+                    Resolved ({{ resolved_count }})
+                </a>
+            </div>
+            <div>
+                <input type="text" class="form-control form-control-sm" placeholder="Filter assigned table..." data-table-filter="#assignedTable" style="min-width: 240px;">
+            </div>
+        </div>
     </div>
 
-    <!-- Assigned Grievances Table (Prompt Section 8) -->
-    <div class="card card-simple shadow-sm">
-        <div class="card-header bg-white">
-            <span class="fw-bold text-dark"><i class="bi bi-inbox me-2 text-primary"></i>Assigned Complaints</span>
+    <!-- Assigned Grievances Table -->
+    <div class="card card-simple shadow-sm bg-white">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark"><i class="bi bi-inbox-fill me-2 text-primary"></i>Assigned Grievance Roster</span>
+            <span class="small text-muted">{{ grievances|length }} record(s)</span>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-clean align-middle mb-0">
+                <table class="table table-clean align-middle mb-0" id="assignedTable">
                     <thead>
                         <tr>
                             <th class="ps-3" style="width: 80px;">ID</th>
                             <th>Complaint Title</th>
-                            <th>Student</th>
+                            <th>Complainant Student</th>
                             <th>Category</th>
                             <th>Priority</th>
                             <th>Status</th>
-                            <th>Date</th>
+                            <th>Lodged Date</th>
                             <th class="text-end pe-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if grievances %}
                             {% for g in grievances %}
-                                <tr>
+                                <tr {% if g.predicted_priority == 'High' and g.status != 'Resolved' %}class="table-danger-subtle"{% endif %}>
                                     <td class="ps-3 fw-bold text-primary">#{{ g.grievance_id }}</td>
                                     <td>
                                         <div class="fw-semibold text-dark">{{ g.title }}</div>
-                                        <div class="text-muted small text-truncate" style="max-width: 320px;">{{ g.description }}</div>
+                                        <div class="text-muted small text-truncate" style="max-width: 300px;">{{ g.description }}</div>
                                     </td>
                                     <td class="small">
-                                        <div class="fw-semibold">{{ g.student.name if g.student else 'Unknown' }}</div>
+                                        <div class="fw-semibold text-dark">{{ g.student.name if g.student else 'Anonymous/Unknown' }}</div>
                                         <div class="text-muted" style="font-size: 0.75rem;">{{ g.student.email if g.student else '' }}</div>
                                     </td>
                                     <td>
@@ -116,7 +153,7 @@
                                     </td>
                                     <td>
                                         {% if g.predicted_priority == 'High' %}
-                                            <span class="badge badge-clean badge-priority-high">High</span>
+                                            <span class="badge badge-clean badge-priority-high"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
                                         {% elif g.predicted_priority == 'Medium' %}
                                             <span class="badge badge-clean badge-priority-medium">Medium</span>
                                         {% else %}
@@ -125,19 +162,19 @@
                                     </td>
                                     <td>
                                         {% if g.status == 'Resolved' %}
-                                            <span class="badge badge-clean badge-resolved">Resolved</span>
+                                            <span class="badge badge-clean badge-resolved"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
                                         {% elif g.status == 'In Progress' %}
-                                            <span class="badge badge-clean badge-progress">In Progress</span>
+                                            <span class="badge badge-clean badge-progress"><i class="bi bi-gear-fill me-1"></i>In Progress</span>
                                         {% elif g.status == 'Assigned' %}
-                                            <span class="badge badge-clean badge-assigned">Assigned</span>
+                                            <span class="badge badge-clean badge-assigned"><i class="bi bi-person-check-fill me-1"></i>Assigned</span>
                                         {% else %}
-                                            <span class="badge badge-clean badge-submitted">Submitted</span>
+                                            <span class="badge badge-clean badge-submitted"><i class="bi bi-clock me-1"></i>Submitted</span>
                                         {% endif %}
                                     </td>
-                                    <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y') if g.created_at else '' }}</td>
+                                    <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y, %I:%M %p') if g.created_at else '' }}</td>
                                     <td class="text-end pe-3">
                                         <a href="{{ url_for('grievance_details', grievance_id=g.grievance_id) }}" class="btn btn-sm btn-portal py-1 px-3">
-                                            Open & Update
+                                            <i class="bi bi-pencil-square me-1"></i> Open & Update
                                         </a>
                                     </td>
                                 </tr>
@@ -145,7 +182,8 @@
                         {% else %}
                             <tr>
                                 <td colspan="8" class="text-center py-5 text-muted">
-                                    No grievances found in your queue.
+                                    <i class="bi bi-check2-all fs-2 d-block mb-2 text-success"></i>
+                                    No complaints currently pending in your assigned department queue.
                                 </td>
                             </tr>
                         {% endif %}

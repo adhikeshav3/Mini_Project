@@ -1,63 +1,130 @@
 /* ==========================================================================
-   STUDENT GRIEVANCE RESOLUTION SYSTEM
-   Clean & Simple Institutional Portal Stylesheet
+   APEX INSTITUTE OF TECHNOLOGY - STUDENT GRIEVANCE PORTAL
+   Enterprise Institutional Design System & Production Stylesheet
    ========================================================================== */
 
 :root {
-  --primary: #1e3a8a;          /* Classic Navy Blue */
-  --primary-hover: #1e40af;
-  --primary-dark: #0f172a;
-  --accent: #d97706;           /* Amber / Gold */
-  --bg-page: #f8fafc;          /* Soft light background */
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --text-main: #1e293b;
+  /* Institutional Color Palette */
+  --navy-dark: #07192f;
+  --navy-primary: #0b2545;
+  --navy-secondary: #134074;
+  --navy-light: #1d4ed8;
+  --navy-hover: #1e3a8a;
+  
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-dark: #94a3b8;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
   --text-muted: #64748b;
   --text-light: #94a3b8;
   
-  --success: #16a34a;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --info: #0284c7;
+  /* Status Colors */
+  --high-bg: #fee2e2;
+  --high-text: #991b1b;
+  --high-border: #fecaca;
+  
+  --med-bg: #fef3c7;
+  --med-text: #92400e;
+  --med-border: #fde68a;
+  
+  --low-bg: #f1f5f9;
+  --low-text: #475569;
+  --low-border: #e2e8f0;
+  
+  --resolved-bg: #dcfce7;
+  --resolved-text: #166534;
+  --resolved-border: #bbf7d0;
+  
+  --progress-bg: #e0f2fe;
+  --progress-text: #0369a1;
+  --progress-border: #bae6fd;
+  
+  --assigned-bg: #ede9fe;
+  --assigned-text: #5b21b6;
+  --assigned-border: #ddd6fe;
+  
+  --submitted-bg: #f3f4f6;
+  --submitted-text: #374151;
+  --submitted-border: #e5e7eb;
+
+  /* Elevation Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
 }
 
+/* Base Document Typography & Layout */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--bg-page);
-  color: var(--text-main);
+  color: var(--text-primary);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* --------------------------------------------------------------------------
-   Simple Navigation Header
+   Institutional Top-Bar (Accreditation & Helpline)
+   -------------------------------------------------------------------------- */
+.top-utility-bar {
+  background-color: var(--navy-dark);
+  color: #94a3b8;
+  font-size: 0.78rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.top-utility-bar a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+.top-utility-bar a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   Main Navigation Header
    -------------------------------------------------------------------------- */
 .navbar-portal {
-  background-color: #0f274a;
-  padding: 0.75rem 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--navy-primary);
+  padding: 0.65rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.85rem;
   text-decoration: none;
   color: #ffffff;
 }
 
+.brand-wrapper:hover {
+  color: #ffffff;
+}
+
 .brand-icon {
-  width: 40px;
-  height: 40px;
-  background-color: #1e3a8a;
-  border: 1px solid #3b82f6;
-  border-radius: 6px;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #134074, #0b2545);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .brand-title {
@@ -65,86 +132,150 @@ body {
   font-weight: 700;
   margin: 0;
   color: #ffffff;
+  letter-spacing: -0.2px;
   line-height: 1.2;
 }
 
 .brand-subtitle {
   font-size: 0.75rem;
   color: #94a3b8;
+  font-weight: 400;
 }
 
 .nav-link-item {
   color: #cbd5e1 !important;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  padding: 0.4rem 0.8rem !important;
-  border-radius: 4px;
-  transition: all 0.15s ease;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 6px;
+  transition: all 0.15s ease-in-out;
 }
 
-.nav-link-item:hover,
+.nav-link-item:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .nav-link-item.active {
   color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
 }
 
 .user-badge {
   background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
   font-size: 0.82rem;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.role-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
   border-radius: 4px;
 }
 
 /* --------------------------------------------------------------------------
-   Cards & Layout
+   Breadcrumb Bar
    -------------------------------------------------------------------------- */
-.card-simple {
+.breadcrumb-strip {
   background-color: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.5rem 0;
+  font-size: 0.82rem;
 }
 
-.card-simple .card-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 1.25rem;
+.breadcrumb-strip a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.breadcrumb-strip a:hover {
+  color: var(--navy-primary);
+  text-decoration: underline;
+}
+
+.breadcrumb-strip .active {
+  color: var(--text-primary);
   font-weight: 600;
-  color: var(--text-main);
-  font-size: 0.95rem;
 }
 
 /* --------------------------------------------------------------------------
-   Simple Metric Stats Cards
+   Cards & Layout Containers
    -------------------------------------------------------------------------- */
-.stat-box {
-  background: #ffffff;
-  border: 1px solid var(--border-color);
+.card-institutional {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.card-institutional:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-institutional .card-header {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.stat-box .stat-number {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--primary);
-  line-height: 1;
+.card-institutional .card-body {
+  padding: 1.25rem;
 }
 
-.stat-box .stat-text {
-  font-size: 0.8rem;
+/* --------------------------------------------------------------------------
+   KPI Metric Stat Boxes
+   -------------------------------------------------------------------------- */
+.stat-box-institutional {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-box-institutional:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-box-institutional .stat-number {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--navy-primary);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.stat-box-institutional .stat-label {
+  font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 0.35rem;
+  margin-top: 0.25rem;
 }
 
-.stat-icon-wrap {
+.stat-icon-wrapper {
   width: 44px;
   height: 44px;
   border-radius: 8px;
@@ -152,83 +283,113 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
-  background: #eff6ff;
-  color: var(--primary);
+  background: var(--bg-subtle);
+  color: var(--navy-primary);
+  flex-shrink: 0;
 }
 
-.stat-icon-wrap.pending { background: #fef3c7; color: #b45309; }
-.stat-icon-wrap.progress { background: #e0f2fe; color: #0369a1; }
-.stat-icon-wrap.resolved { background: #dcfce7; color: #15803d; }
-.stat-icon-wrap.danger { background: #fee2e2; color: #dc2626; }
+.stat-icon-wrapper.pending { background: #fef3c7; color: #92400e; }
+.stat-icon-wrapper.progress { background: #e0f2fe; color: #0369a1; }
+.stat-icon-wrapper.resolved { background: #dcfce7; color: #166534; }
+.stat-icon-wrapper.danger { background: #fee2e2; color: #991b1b; }
 
 /* --------------------------------------------------------------------------
-   Clean Tables
+   High-Priority / Safety Alert Strip
    -------------------------------------------------------------------------- */
-.table-clean {
+.alert-urgent-strip {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Institutional Tables
+   -------------------------------------------------------------------------- */
+.table-institutional {
   width: 100%;
   margin-bottom: 0;
   font-size: 0.88rem;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.table-clean thead th {
+.table-institutional thead th {
   background-color: #f8fafc;
   color: #475569;
   font-weight: 600;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid var(--border-color);
-  padding: 0.75rem 1rem;
-}
-
-.table-clean tbody td {
+  letter-spacing: 0.6px;
+  border-top: none;
+  border-bottom: 1px solid var(--border-subtle);
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid var(--border-color);
-  vertical-align: middle;
+  white-space: nowrap;
 }
 
-.table-clean tbody tr:hover {
+.table-institutional tbody td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+  color: var(--text-primary);
+}
+
+.table-institutional tbody tr:hover {
   background-color: #f8fafc;
 }
 
-/* --------------------------------------------------------------------------
-   Simple Badges
-   -------------------------------------------------------------------------- */
-.badge-clean {
-  padding: 0.35em 0.65em;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 4px;
+.table-institutional tbody tr:last-child td {
+  border-bottom: none;
 }
 
-.badge-submitted { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-.badge-assigned { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-.badge-progress { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-.badge-resolved { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+/* --------------------------------------------------------------------------
+   Status & Priority Badges
+   -------------------------------------------------------------------------- */
+.badge-portal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 4px;
+  line-height: 1.2;
+}
 
-.badge-priority-high { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
-.badge-priority-medium { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-.badge-priority-low { background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+.badge-portal-submitted { background: var(--submitted-bg); color: var(--submitted-text); border: 1px solid var(--submitted-border); }
+.badge-portal-assigned { background: var(--assigned-bg); color: var(--assigned-text); border: 1px solid var(--assigned-border); }
+.badge-portal-progress { background: var(--progress-bg); color: var(--progress-text); border: 1px solid var(--progress-border); }
+.badge-portal-resolved { background: var(--resolved-bg); color: var(--resolved-text); border: 1px solid var(--resolved-border); }
+
+.badge-prio-high { background: var(--high-bg); color: var(--high-text); border: 1px solid var(--high-border); }
+.badge-prio-medium { background: var(--med-bg); color: var(--med-text); border: 1px solid var(--med-border); }
+.badge-prio-low { background: var(--low-bg); color: var(--low-text); border: 1px solid var(--low-border); }
+
+.badge-sentiment-pos { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+.badge-sentiment-neu { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+.badge-sentiment-neg { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
 
 /* --------------------------------------------------------------------------
-   Status Tracker Stepper
+   Status Timeline Stepper
    -------------------------------------------------------------------------- */
-.step-tracker {
+.step-tracker-institutional {
   display: flex;
   justify-content: space-between;
   position: relative;
-  margin: 1.5rem 0;
-  padding: 0 1rem;
+  margin: 1.75rem 0 1.25rem 0;
+  padding: 0 1.5rem;
 }
 
-.step-tracker::before {
+.step-tracker-institutional::before {
   content: '';
   position: absolute;
-  top: 15px;
-  left: 8%;
-  right: 8%;
+  top: 17px;
+  left: 10%;
+  right: 10%;
   height: 2px;
-  background-color: #e2e8f0;
+  background-color: var(--border-subtle);
   z-index: 1;
 }
 
@@ -236,41 +397,44 @@ body {
   position: relative;
   z-index: 2;
   text-align: center;
-  background-color: #ffffff;
-  padding: 0 0.5rem;
+  background-color: var(--bg-surface);
+  padding: 0 0.75rem;
 }
 
 .tracker-dot {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #cbd5e1;
-  color: #94a3b8;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-strong);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 0.4rem auto;
-  font-size: 0.85rem;
+  margin: 0 auto 0.5rem auto;
+  font-size: 0.9rem;
   font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .tracker-node.completed .tracker-dot {
   background: #16a34a;
   border-color: #16a34a;
   color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
 }
 
 .tracker-node.active .tracker-dot {
-  background: #1e3a8a;
-  border-color: #1e3a8a;
+  background: var(--navy-primary);
+  border-color: var(--navy-primary);
   color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(11, 37, 69, 0.18);
 }
 
 .tracker-title {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--text-primary);
 }
 
 .tracker-sub {
@@ -279,72 +443,169 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Vertical Audit History Log
+   -------------------------------------------------------------------------- */
+.audit-timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.audit-timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background-color: var(--border-subtle);
+}
+
+.audit-entry {
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.audit-entry:last-child {
+  padding-bottom: 0;
+}
+
+.audit-entry::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--navy-primary);
+}
+
+.audit-entry.completed::before {
+  border-color: #16a34a;
+}
+
+/* --------------------------------------------------------------------------
+   Form Controls & Inputs
+   -------------------------------------------------------------------------- */
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.form-control, .form-select {
+  font-size: 0.88rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 0.55rem 0.85rem;
+  color: var(--text-primary);
+  background-color: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--navy-secondary);
+  box-shadow: 0 0 0 3px rgba(19, 64, 116, 0.15);
+  outline: none;
+}
+
+.form-control-sm, .form-select-sm {
+  font-size: 0.82rem;
+  padding: 0.4rem 0.7rem;
+}
+
+/* Drag-and-drop file upload zone */
+.file-upload-box {
+  border: 2px dashed var(--border-strong);
+  border-radius: 8px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  background-color: #fafbfd;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.file-upload-box:hover {
+  border-color: var(--navy-secondary);
+  background-color: #f1f5f9;
+}
+
+/* --------------------------------------------------------------------------
    Buttons
    -------------------------------------------------------------------------- */
 .btn-portal {
-  background-color: #1e3a8a;
+  background-color: var(--navy-primary);
   color: #ffffff;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   padding: 0.5rem 1.15rem;
   border-radius: 6px;
-  border: 1px solid #1e3a8a;
+  border: 1px solid var(--navy-primary);
+  transition: all 0.15s ease-in-out;
 }
 
-.btn-portal:hover {
-  background-color: #1e40af;
+.btn-portal:hover, .btn-portal:focus {
+  background-color: var(--navy-hover);
+  border-color: var(--navy-hover);
   color: #ffffff;
 }
 
 .btn-portal-outline {
   background-color: transparent;
-  color: #1e3a8a;
+  color: var(--navy-primary);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   padding: 0.5rem 1.15rem;
   border-radius: 6px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
+  transition: all 0.15s ease-in-out;
 }
 
 .btn-portal-outline:hover {
-  background-color: #f1f5f9;
-  color: #1e3a8a;
+  background-color: var(--bg-subtle);
+  border-color: var(--navy-primary);
+  color: var(--navy-primary);
+}
+
+.btn-sm {
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
 }
 
 /* --------------------------------------------------------------------------
-   History items
+   Empty States
    -------------------------------------------------------------------------- */
-.history-entry {
-  border-left: 2px solid #e2e8f0;
-  padding-left: 1rem;
-  position: relative;
-  padding-bottom: 1.25rem;
+.empty-state-box {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  color: var(--text-muted);
 }
 
-.history-entry:last-child {
-  padding-bottom: 0;
-}
-
-.history-entry::before {
-  content: '';
-  position: absolute;
-  left: -5px;
-  top: 4px;
-  width: 8px;
-  height: 8px;
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  background-color: #1e3a8a;
+  background-color: var(--bg-subtle);
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
 }
 
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
 .portal-footer {
-  background-color: #0f172a;
+  background-color: var(--navy-dark);
   color: #94a3b8;
-  padding: 1.75rem 0;
+  padding: 2.25rem 0 1.5rem 0;
   margin-top: auto;
   font-size: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .portal-footer a {
@@ -355,4 +616,25 @@ body {
 .portal-footer a:hover {
   color: #ffffff;
   text-decoration: underline;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .step-tracker-institutional {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0;
+  }
+  .step-tracker-institutional::before {
+    display: none;
+  }
+  .tracker-node {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+  .tracker-dot {
+    margin: 0;
+  }
 }
