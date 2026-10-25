@@ -221,17 +221,17 @@ def submit_grievance():
                 file_obj=file_obj
             )
 
+            dept_name = grievance.assigned_department.department_name if grievance.assigned_department else 'Administrative Office'
             success_msg = (
-                f"Grievance #{grievance.grievance_id} submitted successfully! "
-                f"AI predicted category: '{grievance.predicted_category}', "
-                f"Priority: '{grievance.predicted_priority}'. "
-                f"Assigned to: {grievance.assigned_department.department_name if grievance.assigned_department else 'Administrative Office'}."
+                f"Grievance docket #{grievance.grievance_id} registered successfully. "
+                f"Domain: '{grievance.predicted_category}', Priority: '{grievance.predicted_priority}'. "
+                f"Dispatched to {dept_name} for official review."
             )
             flash(success_msg, "success")
 
             if duplicates:
                 flash(
-                    f"Notice: Our AI system detected {len(duplicates)} potentially related grievance(s) already logged in the system.",
+                    f"Notice: The system identified {len(duplicates)} related grievance(s) already logged in the institutional register.",
                     "info"
                 )
 

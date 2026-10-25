@@ -21,21 +21,50 @@ STOPWORDS = {
     'you\'ll', 'you\'re', 'you\'ve', 'your', 'yours', 'yourself', 'yourselves'
 }
 
+# Contractions dictionary for standardization
+CONTRACTIONS = {
+    "don't": "do not",
+    "doesn't": "does not",
+    "didn't": "did not",
+    "can't": "cannot",
+    "cannot": "cannot",
+    "won't": "will not",
+    "wouldn't": "would not",
+    "shouldn't": "should not",
+    "couldn't": "could not",
+    "isn't": "is not",
+    "aren't": "are not",
+    "wasn't": "was not",
+    "weren't": "were not",
+    "haven't": "have not",
+    "hasn't": "has not",
+    "hadn't": "had not"
+}
+
+# Negation words crucial for accurate sentiment and priority classification
+NEGATION_WORDS = {'no', 'nor', 'not', 'never', 'none', 'cannot', 'without'}
+EFFECTIVE_STOPWORDS = {w for w in STOPWORDS if w not in NEGATION_WORDS and w not in CONTRACTIONS}
+
 def clean_text(text: str, remove_stopwords: bool = True) -> str:
     """
     Cleans and standardizes raw complaint text for NLP pipeline.
     Steps:
       1. Lowercase conversion
-      2. URL and email removal
-      3. Punctuation and special symbol stripping
-      4. Whitespace normalization
-      5. Optional stopword removal
+      2. Contraction normalization (e.g. don't -> do not)
+      3. URL and email removal
+      4. Punctuation and special symbol stripping
+      5. Whitespace normalization
+      6. Optional stopword removal (preserving key negation terms)
     """
     if not text or not isinstance(text, str):
         return ""
 
     # Convert to lowercase
     text = text.lower()
+
+    # Expand contractions before stripping punctuation
+    for contr, exp in CONTRACTIONS.items():
+        text = text.replace(contr, exp)
 
     # Remove URLs and emails
     text = re.sub(r'https?://\S+|www\.\S+', '', text)
@@ -48,8 +77,9 @@ def clean_text(text: str, remove_stopwords: bool = True) -> str:
     tokens = text.split()
 
     if remove_stopwords:
-        tokens = [token for token in tokens if token not in STOPWORDS and len(token) > 1]
+        tokens = [token for token in tokens if token not in EFFECTIVE_STOPWORDS and len(token) > 1]
     else:
         tokens = [token for token in tokens if len(token) > 1]
 
     return " ".join(tokens)
+

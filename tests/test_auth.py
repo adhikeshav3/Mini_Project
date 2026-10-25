@@ -23,7 +23,7 @@ class TestAuthenticationAndRBAC(unittest.TestCase):
             'password': 'student123'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Student Portal Dashboard", response.data)
+        self.assertIn(b"Student Grievance Desk", response.data)
 
     def test_staff_login_and_redirect(self):
         response = self.client.post('/login', data={
@@ -31,7 +31,7 @@ class TestAuthenticationAndRBAC(unittest.TestCase):
             'password': 'staff123'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Department Officer Workspace", response.data)
+        self.assertIn(b"Departmental Inquiry", response.data)
 
     def test_admin_login_and_redirect(self):
         response = self.client.post('/login', data={
@@ -39,7 +39,7 @@ class TestAuthenticationAndRBAC(unittest.TestCase):
             'password': 'admin123'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Institutional Administration Center", response.data)
+        self.assertIn(b"Administrative Oversight", response.data)
 
     def test_invalid_credentials_rejected(self):
         response = self.client.post('/login', data={
@@ -62,7 +62,7 @@ class TestAuthenticationAndRBAC(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # Should be redirected to student dashboard with access denied flash
         self.assertIn(b"Access denied", response.data)
-        self.assertIn(b"Student Portal Dashboard", response.data)
+        self.assertIn(b"Student Grievance Desk", response.data)
 
     def test_unauthenticated_redirected_to_login(self):
         response = self.client.get('/student/dashboard', follow_redirects=True)

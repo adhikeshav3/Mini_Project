@@ -72,10 +72,10 @@ class GrievanceService:
 
             # 6. Add Initial History Log
             history_remarks = (
-                f"Grievance submitted by student. "
-                f"AI Classification: Category='{prediction['category']}' ({prediction['confidence']*100:.0f}% confidence), "
-                f"Priority='{prediction['priority']}' ({'Escalated due to safety keywords' if prediction['is_safety_escalated'] else 'Model prediction'}), "
-                f"Sentiment='{prediction['sentiment']}'. "
+                f"Grievance formally registered. "
+                f"Classification: Domain='{prediction['category']}' ({prediction['confidence']*100:.0f}% confidence), "
+                f"Priority='{prediction['priority']}' ({'Escalated due to critical hazard keywords' if prediction['is_safety_escalated'] else 'Assessed urgency'}), "
+                f"Tone='{prediction['sentiment']}'. "
                 f"{routing_info['routing_reason']}"
             )
             history_entry = GrievanceStatusHistory(

@@ -1,56 +1,93 @@
+/* ==========================================================================
+   APEX INSTITUTE OF ENGINEERING & TECHNOLOGY
+   Centralized Student Grievance Redressal Portal (C-SGRP)
+   Official Institutional Stylesheet
+   ========================================================================== */
+
 :root {
-  --primary-navy: #0f274a;
-  --secondary-navy: #1a365d;
-  --accent-gold: #c28c19;
-  --accent-gold-hover: #a87510;
-  --bg-light: #f8fafc;
-  --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --text-dark: #1e293b;
-  --text-muted: #64748b;
-  --success-emerald: #059669;
-  --warning-amber: #d97706;
-  --danger-crimson: #dc2626;
-  --info-sky: #0284c7;
+  /* Classic Institutional Academic Palette */
+  --primary-navy: #002147;         /* Oxford Academic Navy */
+  --secondary-navy: #0b2545;       /* Deep Slate Navy */
+  --nav-hover: #133b66;            /* Subtle Nav Hover */
+  --accent-gold: #c59b27;          /* Traditional University Gold */
+  --accent-maroon: #800000;        /* Formal Academic Maroon */
+  
+  --bg-canvas: #f4f6f8;            /* Dignified Administrative Background */
+  --card-bg: #ffffff;              /* Crisp White Surface */
+  --border-light: #dce2e6;         /* Subtle Neutral Border */
+  --border-dark: #cbd5e1;          /* Defined Table/Input Border */
+  
+  --text-primary: #1a202c;         /* High-contrast readable body text */
+  --text-secondary: #4a5568;       /* Institutional secondary text */
+  --text-muted: #718096;           /* Subtle metadata text */
+  
+  /* Formal Status Indicators */
+  --status-submitted: #4a5568;
+  --status-assigned: #0369a1;
+  --status-progress: #b45309;
+  --status-resolved: #15803d;
+  --status-critical: #b91c1c;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  line-height: 1.5;
 }
 
-/* Institutional Navigation */
+/* --------------------------------------------------------------------------
+   Top Institutional Utility Header
+   -------------------------------------------------------------------------- */
+.top-institutional-bar {
+  background-color: #0b1a2d;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-institutional-bar a {
+  color: #e2e8f0;
+  text-decoration: none;
+}
+
+.top-institutional-bar a:hover {
+  color: var(--accent-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Main Institutional Navigation
+   -------------------------------------------------------------------------- */
 .navbar-institutional {
   background-color: var(--primary-navy);
-  border-bottom: 3px solid var(--accent-gold);
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  border-bottom: 3.5px solid var(--accent-gold);
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .navbar-brand-portal {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  color: #ffffff;
+  gap: 0.85rem;
   text-decoration: none;
 }
 
 .brand-crest {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 4px;
-  background: linear-gradient(135deg, #1e3a8a, #0f274a);
+  background-color: #001733;
   border: 1.5px solid var(--accent-gold);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.35rem;
 }
 
 .brand-text h1 {
@@ -58,76 +95,110 @@ body {
   font-weight: 700;
   margin: 0;
   color: #ffffff;
-  letter-spacing: -0.2px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .brand-text span {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: #cbd5e1;
   display: block;
+  font-weight: 400;
 }
 
 .nav-link-custom {
   color: #e2e8f0 !important;
   font-weight: 500;
-  font-size: 0.9rem;
-  padding: 0.5rem 0.85rem !important;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-size: 0.88rem;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 3px;
+  transition: all 0.15s ease-in-out;
 }
 
 .nav-link-custom:hover,
 .nav-link-custom.active {
   color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--nav-hover);
 }
 
 .user-badge {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   padding: 0.35rem 0.75rem;
-  border-radius: 4px;
+  border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Institutional Cards */
+/* --------------------------------------------------------------------------
+   Institutional Notice Marquee & Sub-header
+   -------------------------------------------------------------------------- */
+.institutional-subbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.4rem 0;
+  font-size: 0.82rem;
+}
+
+.notice-pill {
+  background-color: var(--accent-maroon);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Administrative Cards & Containers
+   -------------------------------------------------------------------------- */
 .card-institutional {
   background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .card-institutional .card-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 1.25rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.85rem 1.25rem;
   font-weight: 600;
   color: var(--primary-navy);
+  font-size: 0.95rem;
 }
 
-/* Metric Cards */
+/* --------------------------------------------------------------------------
+   Formal Summary / Metric Cards
+   -------------------------------------------------------------------------- */
 .stat-card {
   background-color: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 1.25rem;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  padding: 1.15rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-left: 4px solid var(--primary-navy);
 }
 
+.stat-card.pending-border { border-left-color: #b45309; }
+.stat-card.progress-border { border-left-color: #0284c7; }
+.stat-card.resolved-border { border-left-color: #15803d; }
+.stat-card.critical-border { border-left-color: #b91c1c; }
+
 .stat-card .stat-value {
-  font-size: 1.85rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--primary-navy);
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .stat-card .stat-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  font-size: 0.76rem;
+  color: var(--text-secondary);
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -135,60 +206,93 @@ body {
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
+  background-color: #f1f5f9;
+  color: var(--primary-navy);
 }
 
-.stat-icon.total { background-color: #eff6ff; color: #1d4ed8; }
-.stat-icon.pending { background-color: #fef3c7; color: #b45309; }
-.stat-icon.progress { background-color: #e0f2fe; color: #0369a1; }
-.stat-icon.resolved { background-color: #d1fae5; color: #047857; }
-.stat-icon.critical { background-color: #fee2e2; color: #b91c1c; }
+/* --------------------------------------------------------------------------
+   Institutional Tables
+   -------------------------------------------------------------------------- */
+.table-institutional {
+  font-size: 0.88rem;
+  margin-bottom: 0;
+}
 
-/* Institutional Badges */
-.badge-status {
-  padding: 0.35em 0.7em;
-  font-weight: 600;
+.table-institutional thead th {
+  background-color: #f1f5f9;
+  color: #334155;
   font-size: 0.75rem;
-  border-radius: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  border-bottom: 1.5px solid var(--border-light);
+  padding: 0.65rem 0.85rem;
 }
 
-.badge-status-submitted { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-.badge-status-assigned { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
-.badge-status-in-progress { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-.badge-status-resolved { background-color: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }
+.table-institutional tbody td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
 
-.badge-priority-high { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-.badge-priority-medium { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.table-institutional tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* --------------------------------------------------------------------------
+   Dignified Badges
+   -------------------------------------------------------------------------- */
+.badge-status {
+  padding: 0.35em 0.65em;
+  font-weight: 600;
+  font-size: 0.72rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-status-submitted { background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+.badge-status-assigned { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.badge-status-in-progress { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.badge-status-resolved { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+.badge-priority-high { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+.badge-priority-medium { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
 .badge-priority-low { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
 
-.badge-sentiment-negative { background-color: #fee2e2; color: #991b1b; }
-.badge-sentiment-neutral { background-color: #f1f5f9; color: #475569; }
-.badge-sentiment-positive { background-color: #ecfdf5; color: #065f46; }
+.badge-sentiment-negative { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+.badge-sentiment-neutral { background-color: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+.badge-sentiment-positive { background-color: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
 
-/* Status Timeline */
+/* --------------------------------------------------------------------------
+   Case Tracking Stepper
+   -------------------------------------------------------------------------- */
 .timeline-stepper {
   display: flex;
   justify-content: space-between;
   position: relative;
-  margin: 2rem 0;
+  margin: 1.75rem 0 1.25rem 0;
   padding: 0 1rem;
 }
 
 .timeline-stepper::before {
   content: '';
   position: absolute;
-  top: 18px;
-  left: 5%;
-  right: 5%;
-  height: 3px;
-  background-color: #e2e8f0;
+  top: 17px;
+  left: 6%;
+  right: 6%;
+  height: 2px;
+  background-color: #cbd5e1;
   z-index: 1;
 }
 
@@ -201,36 +305,36 @@ body {
 }
 
 .timeline-circle {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background-color: #ffffff;
-  border: 3px solid #cbd5e1;
-  color: #94a3b8;
+  border: 2px solid #94a3b8;
+  color: #64748b;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 0.5rem auto;
-  font-weight: 700;
-  font-size: 0.9rem;
+  margin: 0 auto 0.4rem auto;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .timeline-step.completed .timeline-circle {
-  background-color: var(--success-emerald);
-  border-color: var(--success-emerald);
+  background-color: #15803d;
+  border-color: #15803d;
   color: #ffffff;
 }
 
 .timeline-step.active .timeline-circle {
-  background-color: var(--secondary-navy);
+  background-color: var(--primary-navy);
   border-color: var(--accent-gold);
   color: #ffffff;
 }
 
 .timeline-step-title {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--text-primary);
 }
 
 .timeline-step-time {
@@ -238,14 +342,17 @@ body {
   color: var(--text-muted);
 }
 
-/* Buttons */
+/* --------------------------------------------------------------------------
+   Official Buttons
+   -------------------------------------------------------------------------- */
 .btn-institutional {
   background-color: var(--primary-navy);
   color: #ffffff;
   border: 1px solid var(--primary-navy);
   font-weight: 500;
+  font-size: 0.88rem;
   padding: 0.5rem 1.15rem;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .btn-institutional:hover {
@@ -258,8 +365,9 @@ body {
   color: var(--primary-navy);
   border: 1px solid var(--primary-navy);
   font-weight: 500;
+  font-size: 0.88rem;
   padding: 0.5rem 1.15rem;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .btn-outline-institutional:hover {
@@ -267,37 +375,12 @@ body {
   color: #ffffff;
 }
 
-/* Footer */
-.footer-institutional {
-  background-color: #0b1c36;
-  color: #94a3b8;
-  padding: 2rem 0 1.5rem 0;
-  margin-top: auto;
-  border-top: 3px solid var(--accent-gold);
-  font-size: 0.85rem;
-}
-
-.footer-institutional h6 {
-  color: #ffffff;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.footer-institutional a {
-  color: #cbd5e1;
-  text-decoration: none;
-}
-
-.footer-institutional a:hover {
-  color: #ffffff;
-  text-decoration: underline;
-}
-
-/* History remarks container */
+/* --------------------------------------------------------------------------
+   Audit Trail Log
+   -------------------------------------------------------------------------- */
 .history-item {
   border-left: 2px solid #cbd5e1;
-  padding-left: 1.25rem;
+  padding-left: 1.15rem;
   position: relative;
   padding-bottom: 1.25rem;
 }
@@ -309,18 +392,41 @@ body {
 .history-item::before {
   content: '';
   position: absolute;
-  left: -6px;
-  top: 4px;
-  width: 10px;
-  height: 10px;
+  left: -5.5px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background-color: var(--secondary-navy);
+  background-color: var(--primary-navy);
 }
 
-/* Live AI Prediction Box */
-.ai-preview-box {
-  background-color: #f8fafc;
-  border: 1px dashed #94a3b8;
-  border-radius: 6px;
-  padding: 1rem;
+/* --------------------------------------------------------------------------
+   Institutional Footer
+   -------------------------------------------------------------------------- */
+.footer-institutional {
+  background-color: #001733;
+  color: #94a3b8;
+  padding: 2.25rem 0 1.5rem 0;
+  margin-top: auto;
+  border-top: 3.5px solid var(--accent-gold);
+  font-size: 0.84rem;
+}
+
+.footer-institutional h6 {
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.footer-institutional a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+.footer-institutional a:hover {
+  color: #ffffff;
+  text-decoration: underline;
 }

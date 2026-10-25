@@ -47,7 +47,7 @@ def train_all_models():
     vectorizer = TfidfVectorizer(
         ngram_range=(1, 2),
         min_df=1,
-        max_features=2500,
+        max_features=5000,
         sublinear_tf=True
     )
     X_train = vectorizer.fit_transform(train_df['cleaned_text'])
@@ -68,7 +68,7 @@ def train_all_models():
     cat_y_train = train_df['category']
     cat_y_test = test_df['category']
 
-    cat_clf = LogisticRegression(max_iter=1000, C=1.5, random_state=RANDOM_SEED)
+    cat_clf = LogisticRegression(max_iter=1000, C=3.0, class_weight='balanced', random_state=RANDOM_SEED)
     cat_clf.fit(X_train, cat_y_train)
     cat_preds = cat_clf.predict(X_test)
 
@@ -83,7 +83,7 @@ def train_all_models():
     print(f"Saved Category Model to: {Config.CATEGORY_MODEL_PATH}")
 
     metrics_report['category_model'] = {
-        'model_name': 'Logistic Regression with TF-IDF',
+        'model_name': 'Logistic Regression (Balanced) with TF-IDF',
         'accuracy': round(cat_acc, 4),
         'weighted_precision': round(cat_prec, 4),
         'weighted_recall': round(cat_rec, 4),
@@ -102,7 +102,7 @@ def train_all_models():
     prio_y_test = test_df['priority']
 
     # Using CalibratedClassifierCV around LinearSVC for calibrated class probabilities
-    base_svm = LinearSVC(C=1.0, random_state=RANDOM_SEED, max_iter=2000)
+    base_svm = LinearSVC(C=1.2, class_weight='balanced', random_state=RANDOM_SEED, max_iter=3000)
     prio_clf = CalibratedClassifierCV(estimator=base_svm, cv=3)
     prio_clf.fit(X_train, prio_y_train)
     prio_preds = prio_clf.predict(X_test)
@@ -129,14 +129,15 @@ def train_all_models():
     }
 
     # -------------------------------------------------------------------
-    # MODEL 3: Sentiment Prediction (Logistic Regression)
+    # MODEL 3: Sentiment Prediction (Calibrated Linear SVM)
     # -------------------------------------------------------------------
     print("\n------------------------------------------------------------------")
-    print("3. Training Sentiment Analysis Model (Logistic Regression)...")
+    print("3. Training Sentiment Analysis Model (Calibrated Linear SVM)...")
     sent_y_train = train_df['sentiment']
     sent_y_test = test_df['sentiment']
 
-    sent_clf = LogisticRegression(max_iter=1000, C=1.2, random_state=RANDOM_SEED)
+    base_svm_sent = LinearSVC(C=1.2, class_weight='balanced', random_state=RANDOM_SEED, max_iter=3000)
+    sent_clf = CalibratedClassifierCV(estimator=base_svm_sent, cv=3)
     sent_clf.fit(X_train, sent_y_train)
     sent_preds = sent_clf.predict(X_test)
 
@@ -151,7 +152,7 @@ def train_all_models():
     print(f"Saved Sentiment Model to: {Config.SENTIMENT_MODEL_PATH}")
 
     metrics_report['sentiment_model'] = {
-        'model_name': 'Logistic Regression with TF-IDF',
+        'model_name': 'Linear SVM (Calibrated) with TF-IDF',
         'accuracy': round(sent_acc, 4),
         'weighted_precision': round(sent_prec, 4),
         'weighted_recall': round(sent_rec, 4),

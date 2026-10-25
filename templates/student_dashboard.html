@@ -4,17 +4,26 @@
 
 {% block content %}
 <div class="container-fluid px-lg-4 py-4">
-    <!-- Header with Quick Action -->
+    <!-- Header with Action -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom">
         <div>
-            <h3 class="fw-bold text-dark mb-0">Student Portal Dashboard</h3>
-            <p class="text-muted small mb-0">Track and manage your submitted institutional grievances</p>
+            <h4 class="fw-bold text-dark mb-0">Student Grievance Desk</h4>
+            <p class="text-secondary small mb-0">Welcome, {{ current_user.name }}. View and monitor the status of your lodged complaints.</p>
         </div>
         <div class="mt-2 mt-md-0">
             <a href="{{ url_for('submit_grievance') }}" class="btn btn-institutional shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Submit New Grievance
+                <i class="bi bi-pencil-square me-1"></i> Lodge New Grievance
             </a>
         </div>
+    </div>
+
+    <!-- Statutory Summary Alert -->
+    <div class="alert alert-light border d-flex align-items-center justify-content-between py-2 px-3 mb-4 small text-secondary">
+        <div>
+            <i class="bi bi-shield-check text-primary me-2"></i>
+            <strong>Institutional SLA Notice:</strong> All lodged matters are acknowledged immediately and assigned to the departmental inquiry officer within 24 working hours.
+        </div>
+        <a href="{{ url_for('student_history') }}" class="text-primary text-decoration-none fw-semibold">View Complete History &rarr;</a>
     </div>
 
     <!-- Overview Metric Cards -->
@@ -23,42 +32,42 @@
             <div class="stat-card">
                 <div>
                     <div class="stat-value">{{ total_submitted }}</div>
-                    <div class="stat-label">Total Submitted</div>
+                    <div class="stat-label">Total Lodged</div>
                 </div>
-                <div class="stat-icon total">
+                <div class="stat-icon">
                     <i class="bi bi-folder2-open"></i>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="stat-card">
+            <div class="stat-card pending-border">
                 <div>
-                    <div class="stat-value">{{ pending_count }}</div>
-                    <div class="stat-label">Pending Review</div>
+                    <div class="stat-value text-dark">{{ pending_count }}</div>
+                    <div class="stat-label">Awaiting Review</div>
                 </div>
-                <div class="stat-icon pending">
+                <div class="stat-icon">
                     <i class="bi bi-hourglass-split"></i>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="stat-card">
+            <div class="stat-card progress-border">
                 <div>
-                    <div class="stat-value">{{ in_progress_count }}</div>
-                    <div class="stat-label">In Progress</div>
+                    <div class="stat-value text-dark">{{ in_progress_count }}</div>
+                    <div class="stat-label">Under Investigation</div>
                 </div>
-                <div class="stat-icon progress">
-                    <i class="bi bi-gear-wide-connected"></i>
+                <div class="stat-icon">
+                    <i class="bi bi-gear"></i>
                 </div>
             </div>
         </div>
         <div class="col-sm-6 col-lg-3">
-            <div class="stat-card">
+            <div class="stat-card resolved-border">
                 <div>
-                    <div class="stat-value">{{ resolved_count }}</div>
-                    <div class="stat-label">Resolved</div>
+                    <div class="stat-value text-success">{{ resolved_count }}</div>
+                    <div class="stat-label">Disposed / Resolved</div>
                 </div>
-                <div class="stat-icon resolved">
+                <div class="stat-icon">
                     <i class="bi bi-check2-circle"></i>
                 </div>
             </div>
@@ -68,21 +77,21 @@
     <!-- Recent Grievances Card -->
     <div class="card card-institutional shadow-sm mb-4">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-dark"><i class="bi bi-list-task me-2 text-primary"></i>My Recent Grievances</span>
-            <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">View All History</a>
+            <span class="fw-bold text-dark"><i class="bi bi-card-checklist me-2 text-primary"></i>My Recent Grievance Submissions</span>
+            <a href="{{ url_for('student_history') }}" class="btn btn-sm btn-outline-secondary">Complete Register</a>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light small text-uppercase text-secondary">
+                <table class="table table-institutional align-middle mb-0">
+                    <thead>
                         <tr>
-                            <th class="ps-3" style="width: 80px;">ID</th>
-                            <th>Complaint Title</th>
-                            <th>AI Category</th>
-                            <th>Urgency</th>
-                            <th>Department</th>
+                            <th class="ps-3" style="width: 85px;">Case ID</th>
+                            <th>Subject / Particulars</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Assigned Cell</th>
                             <th>Status</th>
-                            <th>Submitted</th>
+                            <th>Date Lodged</th>
                             <th class="text-end pe-3">Action</th>
                         </tr>
                     </thead>
@@ -110,28 +119,28 @@
                                     <td class="small">{{ g.assigned_department.department_name if g.assigned_department else 'Pending Assignment' }}</td>
                                     <td>
                                         {% if g.status == 'Resolved' %}
-                                            <span class="badge badge-status badge-status-resolved">Resolved</span>
+                                            <span class="badge badge-status badge-status-resolved"><i class="bi bi-check2"></i> Resolved</span>
                                         {% elif g.status == 'In Progress' %}
-                                            <span class="badge badge-status badge-status-in-progress">In Progress</span>
+                                            <span class="badge badge-status badge-status-in-progress"><i class="bi bi-clock"></i> In Progress</span>
                                         {% elif g.status == 'Assigned' %}
-                                            <span class="badge badge-status badge-status-assigned">Assigned</span>
+                                            <span class="badge badge-status badge-status-assigned"><i class="bi bi-arrow-right"></i> Assigned</span>
                                         {% else %}
-                                            <span class="badge badge-status badge-status-submitted">Submitted</span>
+                                            <span class="badge badge-status badge-status-submitted"><i class="bi bi-envelope"></i> Submitted</span>
                                         {% endif %}
                                     </td>
                                     <td class="small text-muted">{{ g.created_at.strftime('%d %b %Y') if g.created_at else '' }}</td>
                                     <td class="text-end pe-3">
                                         <a href="{{ url_for('grievance_details', grievance_id=g.grievance_id) }}" class="btn btn-sm btn-outline-institutional py-1 px-2">
-                                            <i class="bi bi-eye me-1"></i> Track
+                                            <i class="bi bi-eye me-1"></i> Track Case
                                         </a>
                                     </td>
                                 </tr>
                             {% endfor %}
                         {% else %}
                             <tr>
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                    No grievances submitted yet. Need assistance? Click "Submit New Grievance" above.
+                                <td colspan="8" class="text-center py-5 text-secondary">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 text-muted"></i>
+                                    No grievances recorded in your profile. To lodge a complaint, click "Lodge New Grievance".
                                 </td>
                             </tr>
                         {% endif %}

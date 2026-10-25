@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Grievance #{{ grievance.grievance_id }} Tracking & Details{% endblock %}
+{% block title %}Case #{{ grievance.grievance_id }} Particulars & Tracking{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -8,14 +8,14 @@
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb small">
             {% if current_user.role == 'student' %}
-                <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="{{ url_for('student_history') }}" class="text-decoration-none">History</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('student_dashboard') }}" class="text-decoration-none">Student Portal</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('student_history') }}" class="text-decoration-none">My Grievances</a></li>
             {% elif current_user.role == 'staff' %}
-                <li class="breadcrumb-item"><a href="{{ url_for('staff_dashboard') }}" class="text-decoration-none">Staff Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('staff_dashboard') }}" class="text-decoration-none">Department Desk</a></li>
             {% else %}
                 <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}" class="text-decoration-none">Admin Console</a></li>
             {% endif %}
-            <li class="breadcrumb-item active" aria-current="page">Grievance #{{ grievance.grievance_id }}</li>
+            <li class="breadcrumb-item active" aria-current="page">Case Record #{{ grievance.grievance_id }}</li>
         </ol>
     </nav>
 
@@ -24,28 +24,28 @@
         <div class="card-body p-4">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
                 <div>
-                    <span class="badge bg-light text-secondary border small mb-1">Grievance Ticket ID: #{{ grievance.grievance_id }}</span>
-                    <h3 class="fw-bold text-dark mb-1">{{ grievance.title }}</h3>
-                    <div class="text-muted small">
-                        Submitted by <strong>{{ grievance.student.name if grievance.student else 'Anonymous' }}</strong> 
-                        ({{ grievance.student.email if grievance.student else '' }}) on 
-                        {{ grievance.created_at.strftime('%A, %d %B %Y at %I:%M %p') if grievance.created_at else '' }}
+                    <span class="badge bg-light text-secondary border small mb-1">Official Case Docket: #{{ grievance.grievance_id }}</span>
+                    <h4 class="fw-bold text-dark mb-1">{{ grievance.title }}</h4>
+                    <div class="text-secondary small">
+                        Lodged by <strong>{{ grievance.student.name if grievance.student else 'Anonymous' }}</strong> 
+                        ({{ grievance.student.email if grievance.student else '' }}) &bull;
+                        Registered on {{ grievance.created_at.strftime('%d %b %Y at %I:%M %p') if grievance.created_at else '' }}
                     </div>
                 </div>
                 <div>
                     {% if grievance.status == 'Resolved' %}
-                        <span class="badge badge-status badge-status-resolved fs-6 px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Resolved</span>
+                        <span class="badge badge-status badge-status-resolved fs-6 px-3 py-2"><i class="bi bi-check2-circle me-1"></i> Disposed / Resolved</span>
                     {% elif grievance.status == 'In Progress' %}
-                        <span class="badge badge-status badge-status-in-progress fs-6 px-3 py-2"><i class="bi bi-tools me-1"></i> In Progress</span>
+                        <span class="badge badge-status badge-status-in-progress fs-6 px-3 py-2"><i class="bi bi-clock-history me-1"></i> Investigation In Progress</span>
                     {% elif grievance.status == 'Assigned' %}
-                        <span class="badge badge-status badge-status-assigned fs-6 px-3 py-2"><i class="bi bi-person-check me-1"></i> Assigned</span>
+                        <span class="badge badge-status badge-status-assigned fs-6 px-3 py-2"><i class="bi bi-arrow-right-circle me-1"></i> Assigned to Cell</span>
                     {% else %}
-                        <span class="badge badge-status badge-status-submitted fs-6 px-3 py-2"><i class="bi bi-inbox me-1"></i> Submitted</span>
+                        <span class="badge badge-status badge-status-submitted fs-6 px-3 py-2"><i class="bi bi-envelope me-1"></i> Formally Lodged</span>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Visual 4-Stage Status Tracking Timeline -->
+            <!-- Formal 4-Stage Status Tracking Timeline -->
             {% set s = grievance.status %}
             <div class="timeline-stepper">
                 <!-- Step 1: Submitted -->
@@ -53,7 +53,7 @@
                     <div class="timeline-circle">
                         <i class="bi bi-check-lg"></i>
                     </div>
-                    <div class="timeline-step-title">Submitted</div>
+                    <div class="timeline-step-title">Lodged</div>
                     <div class="timeline-step-time">{{ grievance.created_at.strftime('%d %b %H:%M') if grievance.created_at else '' }}</div>
                 </div>
 
@@ -71,8 +71,8 @@
                     <div class="timeline-circle">
                         {% if s in ['In Progress', 'Resolved'] %}<i class="bi bi-check-lg"></i>{% else %}3{% endif %}
                     </div>
-                    <div class="timeline-step-title">In Progress</div>
-                    <div class="timeline-step-time">Action Initiated</div>
+                    <div class="timeline-step-title">Action Initiated</div>
+                    <div class="timeline-step-time">Inspection Underway</div>
                 </div>
 
                 <!-- Step 4: Resolved -->
@@ -80,7 +80,7 @@
                     <div class="timeline-circle">
                         {% if s == 'Resolved' %}<i class="bi bi-check2-all"></i>{% else %}4{% endif %}
                     </div>
-                    <div class="timeline-step-title">Resolved</div>
+                    <div class="timeline-step-title">Disposed</div>
                     <div class="timeline-step-time">{{ grievance.resolved_at.strftime('%d %b %H:%M') if grievance.resolved_at else 'Pending' }}</div>
                 </div>
             </div>
@@ -88,12 +88,12 @@
     </div>
 
     <div class="row g-4">
-        <!-- Left Column: Complaint Details & AI Analysis -->
+        <!-- Left Column: Complaint Details & Timeline -->
         <div class="col-lg-8">
             <!-- Full Description Card -->
             <div class="card card-institutional shadow-sm mb-4">
                 <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-file-text me-2 text-primary"></i>Complaint Narrative</h6>
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-file-text me-2 text-primary"></i>Statement of Grievance</h6>
                 </div>
                 <div class="card-body p-4">
                     <p class="text-dark mb-3" style="line-height: 1.7; white-space: pre-wrap;">{{ grievance.description }}</p>
@@ -103,12 +103,12 @@
                             <div class="d-flex align-items-center gap-2">
                                 <i class="bi bi-paperclip fs-4 text-primary"></i>
                                 <div>
-                                    <strong class="d-block text-dark small">Uploaded Supporting Document</strong>
-                                    <span class="text-muted small">{{ grievance.attachment_path }}</span>
+                                    <strong class="d-block text-dark small">Supporting Documentary Proof</strong>
+                                    <span class="text-secondary small">{{ grievance.attachment_path }}</span>
                                 </div>
                             </div>
                             <a href="{{ url_for('static', filename='uploads/' + grievance.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-box-arrow-up-right me-1"></i> View Attachment
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Inspect Document
                             </a>
                         </div>
                     {% endif %}
@@ -118,7 +118,7 @@
             <!-- Historical Audit Trail Log -->
             <div class="card card-institutional shadow-sm mb-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Resolution Audit Log & Progress Timeline</h6>
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Official Disposal Log & Progress Notes</h6>
                     <span class="badge bg-light text-secondary border small">{{ grievance.status_history|length }} entries</span>
                 </div>
                 <div class="card-body p-4">
@@ -128,7 +128,7 @@
                                 <div class="d-flex justify-content-between align-items-baseline mb-1">
                                     <span class="fw-semibold text-dark small">
                                         Status: <span class="badge bg-secondary">{{ h.new_status }}</span>
-                                        <span class="text-muted ms-1">(by {{ h.updater.name if h.updater else 'System' }})</span>
+                                        <span class="text-secondary ms-1">(by {{ h.updater.name if h.updater else 'System' }})</span>
                                     </span>
                                     <span class="text-muted small" style="font-size: 0.75rem;">
                                         {{ h.updated_at.strftime('%d %b %Y, %I:%M %p') }}
@@ -151,7 +151,7 @@
                         {% if grievance.feedback %}
                             <div class="p-3 bg-light rounded border">
                                 <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="fw-bold text-dark">Student Rating:</span>
+                                    <span class="fw-bold text-dark small">Satisfaction Rating:</span>
                                     <div class="text-warning">
                                         {% for i in range(grievance.feedback.rating) %}
                                             <i class="bi bi-star-fill"></i>
@@ -162,33 +162,33 @@
                                     </div>
                                     <span class="badge bg-success ms-2">{{ grievance.feedback.rating }}/5 Stars</span>
                                 </div>
-                                <p class="text-secondary small mb-1"><strong>Comments:</strong> "{{ grievance.feedback.comments or 'No written comments.' }}"</p>
-                                <span class="text-muted small" style="font-size: 0.72rem;">Submitted on {{ grievance.feedback.submitted_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                                <p class="text-secondary small mb-1"><strong>Student Comments:</strong> "{{ grievance.feedback.comments or 'No written comments.' }}"</p>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Recorded on {{ grievance.feedback.submitted_at.strftime('%d %b %Y, %I:%M %p') }}</span>
                             </div>
                         {% elif current_user.role == 'student' and current_user.user_id == grievance.student_id %}
                             <form method="POST" action="{{ url_for('submit_feedback', grievance_id=grievance.grievance_id) }}">
-                                <p class="text-muted small mb-3">This grievance was marked resolved. Please rate the quality and timeliness of the resolution.</p>
+                                <p class="text-secondary small mb-3">This grievance was marked as resolved by the concerned department. Please record your verification feedback.</p>
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold small text-dark">Satisfaction Rating (1 to 5 Stars):</label>
-                                    <select class="form-select form-select-sm" name="rating" required style="max-width: 200px;">
-                                        <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent & Timely</option>
-                                        <option value="4">⭐⭐⭐⭐ 4 - Good Resolution</option>
-                                        <option value="3" selected>⭐⭐⭐ 3 - Satisfactory</option>
-                                        <option value="2">⭐⭐ 2 - Needs Improvement</option>
-                                        <option value="1">⭐ 1 - Unsatisfactory</option>
+                                    <label class="form-label fw-semibold small text-dark">Satisfaction Rating:</label>
+                                    <select class="form-select form-select-sm" name="rating" required style="max-width: 220px;">
+                                        <option value="5">5 - Completely Satisfied</option>
+                                        <option value="4">4 - Good Resolution</option>
+                                        <option value="3" selected>3 - Satisfactory</option>
+                                        <option value="2">2 - Needs Improvement</option>
+                                        <option value="1">1 - Unsatisfactory</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold small text-dark">Comments / Acknowledgement:</label>
-                                    <textarea class="form-control" name="comments" rows="2" placeholder="Describe your experience with the resolution team..."></textarea>
+                                    <label class="form-label fw-semibold small text-dark">Student Remarks / Acknowledgement:</label>
+                                    <textarea class="form-control" name="comments" rows="2" placeholder="State whether the issue was resolved properly..."></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-institutional">
-                                    <i class="bi bi-check-circle me-1"></i> Submit Student Feedback
+                                    <i class="bi bi-check-circle me-1"></i> Submit Resolution Feedback
                                 </button>
                             </form>
                         {% else %}
-                            <div class="text-muted small">
-                                <i class="bi bi-info-circle me-1"></i> Student has not submitted feedback on this resolution yet.
+                            <div class="text-secondary small">
+                                <i class="bi bi-info-circle me-1"></i> Student verification feedback is pending.
                             </div>
                         {% endif %}
                     </div>
@@ -196,26 +196,26 @@
             {% endif %}
         </div>
 
-        <!-- Right Column: AI Model Predictions & Staff Action Panel -->
+        <!-- Right Column: Classification & Officer Panel -->
         <div class="col-lg-4">
-            <!-- AI Inference Summary Card -->
+            <!-- Official Classification Summary Card -->
             <div class="card card-institutional shadow-sm mb-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-cpu-fill text-primary me-2"></i>AI Inference Engine</h6>
-                    <span class="badge bg-light text-primary border small">Scikit-Learn</span>
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-journal-check text-primary me-2"></i>Case Particulars</h6>
+                    <span class="badge bg-light text-secondary border small">Verified Registry</span>
                 </div>
                 <div class="card-body p-3">
                     <ul class="list-group list-group-flush small">
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">Predicted Category:</span>
+                            <span class="text-secondary">Assigned Domain:</span>
                             <span class="fw-bold text-dark">{{ grievance.predicted_category }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">TF-IDF Confidence:</span>
-                            <span class="fw-bold text-primary">{{ (grievance.category_confidence * 100)|round|int if grievance.category_confidence else '88' }}%</span>
+                            <span class="text-secondary">Classification Confidence:</span>
+                            <span class="fw-semibold text-primary">{{ (grievance.category_confidence * 100)|round|int if grievance.category_confidence else '88' }}%</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">Predicted Priority:</span>
+                            <span class="text-secondary">Priority Rating:</span>
                             {% if grievance.predicted_priority == 'High' %}
                                 <span class="badge badge-status badge-priority-high">High Urgency</span>
                             {% elif grievance.predicted_priority == 'Medium' %}
@@ -225,9 +225,9 @@
                             {% endif %}
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">Detected Sentiment:</span>
+                            <span class="text-secondary">Assessed Tone:</span>
                             {% if grievance.predicted_sentiment == 'Negative' %}
-                                <span class="badge badge-sentiment-negative">Negative</span>
+                                <span class="badge badge-sentiment-negative">Distressed</span>
                             {% elif grievance.predicted_sentiment == 'Positive' %}
                                 <span class="badge badge-sentiment-positive">Positive</span>
                             {% else %}
@@ -235,19 +235,19 @@
                             {% endif %}
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">Assigned Department:</span>
+                            <span class="text-secondary">Responsible Cell:</span>
                             <span class="fw-semibold text-dark">{{ grievance.assigned_department.department_name if grievance.assigned_department else 'Unassigned' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span class="text-muted">Department Officer:</span>
-                            <span class="fw-semibold text-dark">{{ grievance.assigned_staff.name if grievance.assigned_staff else 'Unassigned' }}</span>
+                            <span class="text-secondary">Nodal Officer:</span>
+                            <span class="fw-semibold text-dark">{{ grievance.assigned_staff.name if grievance.assigned_staff else 'Awaiting Allocation' }}</span>
                         </li>
                     </ul>
 
                     {% if grievance.duplicate_matches %}
                         <div class="alert alert-warning p-2 small mt-3 mb-0">
                             <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                            <strong>Duplicate Flag:</strong> Matches {{ grievance.duplicate_matches|length }} other complaint(s) with similarity >= 55%.
+                            <strong>Duplicate Flag:</strong> Correlates with {{ grievance.duplicate_matches|length }} existing complaint(s) (similarity match &ge; 55%).
                         </div>
                     {% endif %}
                 </div>
@@ -257,23 +257,23 @@
             {% if current_user.role in ['staff', 'admin'] %}
                 <div class="card card-institutional shadow-sm mb-4 border-primary">
                     <div class="card-header bg-light py-3">
-                        <h6 class="fw-bold text-primary mb-0"><i class="bi bi-pencil-square me-2"></i>Officer Action Panel</h6>
-                        <span class="text-muted small">Update status and document progress remarks</span>
+                        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-square me-2 text-primary"></i>Nodal Officer Action Form</h6>
+                        <span class="text-secondary small">Update status and record official inspection remarks</span>
                     </div>
                     <div class="card-body p-3">
                         <form method="POST" action="{{ url_for('update_grievance_status', grievance_id=grievance.grievance_id) }}">
                             <div class="mb-3">
-                                <label for="status" class="form-label small fw-semibold text-dark">Update Status:</label>
+                                <label for="status" class="form-label small fw-semibold text-dark">Update Disposal Status:</label>
                                 <select class="form-select form-select-sm" id="status" name="status" required>
-                                    <option value="Assigned" {% if grievance.status == 'Assigned' %}selected{% endif %}>Assigned (Awaiting Inspection)</option>
-                                    <option value="In Progress" {% if grievance.status == 'In Progress' %}selected{% endif %}>In Progress (Work Ongoing)</option>
-                                    <option value="Resolved" {% if grievance.status == 'Resolved' %}selected{% endif %}>Resolved (Action Completed)</option>
+                                    <option value="Assigned" {% if grievance.status == 'Assigned' %}selected{% endif %}>Assigned (Under Initial Review)</option>
+                                    <option value="In Progress" {% if grievance.status == 'In Progress' %}selected{% endif %}>In Progress (Work / Inquiry Ongoing)</option>
+                                    <option value="Resolved" {% if grievance.status == 'Resolved' %}selected{% endif %}>Resolved (Remediation Completed)</option>
                                 </select>
                             </div>
 
                             <div class="mb-3">
                                 <label for="remarks" class="form-label small fw-semibold text-dark">Official Action Remarks:</label>
-                                <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="Enter specific actions taken, team deployed, or resolution notes..." required></textarea>
+                                <textarea class="form-control form-control-sm" id="remarks" name="remarks" rows="3" placeholder="Enter findings, physical repairs completed, or administrative orders issued..." required></textarea>
                             </div>
 
                             <button type="submit" class="btn btn-sm btn-institutional w-100 py-2">
@@ -284,7 +284,7 @@
                         {% if current_user.role == 'admin' %}
                             <hr class="my-3">
                             <a href="{{ url_for('admin_reassign', grievance_id=grievance.grievance_id) }}" class="btn btn-sm btn-outline-secondary w-100">
-                                <i class="bi bi-arrow-left-right me-1"></i> Admin Reassign Department
+                                <i class="bi bi-arrow-left-right me-1"></i> Reassign Cell / Correct Category
                             </a>
                         {% endif %}
                     </div>
