@@ -70,16 +70,12 @@ def role_required(*allowed_roles):
 # PUBLIC ROUTES
 # -------------------------------------------------------------------
 
-@app.route('/')
+@app.route('/home.html')
+@app.route('/index.html')
+@app.route('/index', strict_slashes=False)
+@app.route('/home', strict_slashes=False)
+@app.route('/', strict_slashes=False)
 def home():
-    if current_user.is_authenticated:
-        if current_user.role == 'student':
-            return redirect(url_for('student_dashboard'))
-        elif current_user.role == 'staff':
-            return redirect(url_for('staff_dashboard'))
-        elif current_user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-
     # Retrieve live portal stats for institutional credibility
     total_count = db_session.query(Grievance).count()
     resolved_count = db_session.query(Grievance).filter_by(status='Resolved').count()
@@ -94,16 +90,10 @@ def home():
         departments=departments
     )
 
+@app.route('/login.html', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        if current_user.role == 'student':
-            return redirect(url_for('student_dashboard'))
-        elif current_user.role == 'staff':
-            return redirect(url_for('staff_dashboard'))
-        elif current_user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
@@ -129,6 +119,8 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/register.html', methods=['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:

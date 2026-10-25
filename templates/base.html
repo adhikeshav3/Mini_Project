@@ -34,6 +34,11 @@
             <div class="collapse navbar-collapse" id="navContent">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
                     {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-item {% if request.endpoint == 'home' %}active{% endif %}" href="{{ url_for('home') }}">
+                                <i class="bi bi-house me-1"></i> Home
+                            </a>
+                        </li>
                         {% if current_user.role == 'student' %}
                             <li class="nav-item">
                                 <a class="nav-link nav-link-item {% if request.endpoint == 'student_dashboard' %}active{% endif %}" href="{{ url_for('student_dashboard') }}">
