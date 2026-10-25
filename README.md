@@ -177,13 +177,37 @@ python ml/generate_dataset.py
 python ml/train_models.py
 ```
 
-### Step 5: Start Flask Application
+### Step 5: Start Flask Application (Local)
 ```bash
 python app.py
 ```
 
 Open your browser and navigate to:
 **`http://127.0.0.1:5000`**
+
+---
+
+## 7.1 Deploying to Vercel (Production)
+
+This repository is pre-configured for zero-friction deployment to **Vercel Serverless**:
+
+### Method A: Deploy via GitHub (Recommended)
+1. Go to [vercel.com](https://vercel.com) and log in with your GitHub account.
+2. Click **"Add New Project"** and import the repository: `adhikeshav3/Mini_Project`.
+3. Leave Framework Preset as **Other** (Vercel automatically detects `vercel.json` and Python runtime via `api/index.py`).
+4. Click **Deploy**.
+5. Once deployment completes, Vercel gives you a live production URL (e.g., `https://mini-project-...vercel.app`).
+
+### Method B: Deploy via Vercel CLI
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+### Vercel Serverless Architecture Notes:
+- **Routing**: `vercel.json` rewrites all requests to `api/index.py`, which exposes the Flask application instance.
+- **Database & Storage**: On Vercel, the application dynamically utilizes `/tmp/grievance.db` with the pre-seeded SQLite database so all demo accounts, departments, and ML models operate seamlessly in serverless environments.
 
 ---
 
